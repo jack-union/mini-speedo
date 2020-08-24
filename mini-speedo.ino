@@ -182,8 +182,7 @@ bool displayChanged = false;
 //----End Variables-------------------
 
 //-----Start-up code run once---------
-void setup(void)
-{
+void setup(void) {
   Serial.begin(115200);
 
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3c, false)) {
@@ -218,13 +217,13 @@ void setup(void)
 //------End Start-up code-------------
 
 //------Start of Loop-----------------
-void loop() {
 
+void loop() {
   do_button();
   gather_data();
   do_display();
-
 }
+
 //-------End of Loop------------------
 
 //-------Start interrupt handling-----
@@ -286,7 +285,7 @@ void gather_data() {
 
 }
 
-void do_display() {
+void do_display() {  
   //display refresh every (updateInterval) milliseconds
   if ( (millis() - displayUpdatedAt) > updateInterval ) {
 
@@ -348,7 +347,6 @@ void increment_display () {
 }
 
 void scroll_mode(String param) {
-
   int len;
   String prt;
 
@@ -376,7 +374,6 @@ void draw_mode(String param) {
 }
 
 void draw_odo(uint32_t readout) {
-
   char data[8] = "";
   sprintf(data, "%07d", readout);
 
@@ -397,34 +394,17 @@ void draw_odo(uint32_t readout) {
 }
 
 void draw_trip(uint32_t readout) {
-
   char data[8] = "";
-  sprintf(data, "%07d", readout);
+  sprintf(data, "%7d", readout);
 
   display.setTextColor(WHITE);
   display.setTextSize(3);
   display.setCursor(7, 38);
 
-  if (readout < 100000) {
-    display.print(" ");
-  } else {
-    display.print(data[1]);
-  }
-  if (readout < 10000) {
-    display.print(" ");
-  } else {
-    display.print(data[2]);
-  }
-  if (readout < 1000) {
-    display.print(" ");
-  } else {
-    display.print(data[3]);
-  }
-  if (readout < 100) {
-    display.print(" ");
-  } else {
-    display.print(data[4]);
-  }
+  display.print(data[1]);
+  display.print(data[2]);
+  display.print(data[3]);
+  display.print(data[4]);
   display.print(data[5]);
 
   display.drawLine(99, 36, 99, 62, WHITE);
@@ -434,7 +414,6 @@ void draw_trip(uint32_t readout) {
 }
 
 void draw_speed(uint16_t readout) {
-
   char data[4] = "";
   sprintf(data, "%3d", readout);
 
@@ -449,7 +428,6 @@ void draw_speed(uint16_t readout) {
 }
 
 void draw_lambda(uint16_t readout) {
-
   char data[4] = "";
   sprintf(data, "%03d", readout);
 
@@ -471,7 +449,6 @@ void draw_lambda(uint16_t readout) {
 }
 
 void draw_oil_temp(uint16_t readout) {
-
   char data[4] = "";
   sprintf(data, "%3d", readout);
 
@@ -490,7 +467,6 @@ void draw_oil_temp(uint16_t readout) {
 }
 
 void draw_oil_press(uint16_t readout) {
-
   char data[4] = "";
   sprintf(data, "%03d", readout);
 
@@ -508,7 +484,6 @@ void draw_oil_press(uint16_t readout) {
 }
 
 void draw_voltage(uint16_t readout) {
-
   char data[4] = "";
   sprintf(data, "%3d", readout);
 
@@ -526,7 +501,6 @@ void draw_voltage(uint16_t readout) {
 }
 
 void draw_water_temp(uint16_t readout) {
-
   char data[4] = "";
   sprintf(data, "%3d", readout);
 
@@ -545,7 +519,6 @@ void draw_water_temp(uint16_t readout) {
 }
 
 void draw_outside_temp(int16_t readout) {
-
   char data[4] = "";
   sprintf(data, "% 3d", readout);
 
@@ -564,7 +537,6 @@ void draw_outside_temp(int16_t readout) {
 }
 
 void draw_rpm(uint16_t readout) {
-
   char data[5] = "";
   sprintf(data, "%4d", readout);
 
@@ -580,7 +552,6 @@ void draw_rpm(uint16_t readout) {
 
 void draw_logo() {
   display.clearDisplay();
-
   display.drawBitmap(
     (display.width()  - LOGO_WIDTH ) / 2,
     (display.height() - LOGO_HEIGHT) / 2,

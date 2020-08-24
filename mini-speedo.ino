@@ -1,5 +1,16 @@
 /*
   Speedo with multifunction display
+
+  Discussed here: https://www.mini-forum.de/forum/thread/95593-elektronischer-mitteltacho/
+
+  Inspired by: https://retromini.weebly.com/blog/arduino-speedometer#
+
+  Complete rewrite, though.
+
+  Uses an Arduino Nano, a X27 stepper motor and a 0,96" OLED SSD1306 display
+
+  jack union, 2020.
+
 */
 
 //----Libraries to Include--------
@@ -46,7 +57,7 @@ const double StepsPerDegree = 3.0;  // Motor step is 1/3 of a degree of rotation
 const unsigned int MaxMotorRotation = 315; // 315 max degrees of movement
 const unsigned int MaxMotorSteps = MaxMotorRotation * StepsPerDegree;
 // Create the motor object with the maximum steps allowed
-//SwitecX25 stepper(MaxMotorSteps, STEPPIN_A, STEPPIN_B, STEPPIN_C, STEPPIN_D);
+SwitecX25 stepper(MaxMotorSteps, STEPPIN_A, STEPPIN_B, STEPPIN_C, STEPPIN_D);
 //----Define Stepper motor library variables and pin outs-------------------------------------------
 
 //----Define other constants-------
@@ -186,7 +197,7 @@ void setup(void)
   draw_logo();
   display.display();
   delay(1500);
-  //  reset_stepper();
+  reset_stepper();
 
   attachInterrupt(digitalPinToInterrupt(INPUT_SPEED), interrupt_speed, RISING);
   attachInterrupt(digitalPinToInterrupt(INPUT_RPM), interrupt_rpm, RISING);
@@ -223,24 +234,22 @@ void interrupt_speed() {
 }
 
 void interrupt_rpm() {
-  
+
 }
 
 //-------End interrupt handling-----
 
 //-------Start of Functions-----------
 
-/*
-  void reset_stepper() {
+void reset_stepper() {
   stepper.zero(); //Initialize stepper at 0 location
   stepper.setPosition(744);
   stepper.updateBlocking();
   delay (500);
-  stepper.setPosition(0);  //0MPH
+  stepper.setPosition(0);
   stepper.updateBlocking();
   delay (500);
-  }
-*/
+}
 
 void do_button() {
   buttonState = digitalRead(INPUT_BUTTON);
@@ -258,7 +267,7 @@ void do_button() {
   } else { //buttonState HIGH
     if (buttonBeforeState == LOW) { //just released
       if ((millis() - timePressed > 50) and (millis() - timePressed < 1000))  { //short press ended
-        incrementDisplay();
+        increment_display();
         displayChanged = true;
       }
       buttonBeforeState = HIGH;
@@ -285,9 +294,8 @@ void do_display() {
       if (displayChanged) {
         scroll_mode(displayNames[displayMode]);
         displayChanged = false;
-      } else {
-        draw_mode(displayNames[displayMode]);
       }
+      draw_mode(displayNames[displayMode]);
     }
 
     switch (displayMode) {
@@ -331,7 +339,7 @@ void do_display() {
   }
 }
 
-void incrementDisplay () {
+void increment_display () {
   if (displayMode < MODEMAX) {
     displayMode++;
   } else {
@@ -360,6 +368,8 @@ void scroll_mode(String param) {
 }
 
 void draw_mode(String param) {
+  display.setTextColor(WHITE);
+  display.setTextSize(2);
   display.clearDisplay();
   display.setCursor(X_OFFSET, 4);
   display.println(param);

@@ -11,6 +11,25 @@
 #include <EEPROM.h>
 //----End Libraries--------------
 
+//----Define PIN Settings----------
+const byte INPUT_SPEED = 2; //Interruptable PIN on Nano
+const byte INPUT_RPM = 3; //Interruptable PIN on Nano
+#define STEPPIN_A 4
+#define STEPPIN_B 5
+#define STEPPIN_C 6
+#define STEPPIN_D 7
+const byte INPUT_BUTTON = 8; //brake light test button
+
+const byte INPUT_WATERTEMP = A0;
+const byte INPUT_OILTEMP = A1;
+const byte INPUT_OILPRESS = A2;
+const byte INPUT_LAMBDA = A3;
+//A4: SDA
+//A5: SCL
+const byte INPUT_OUTSIDETEMP = A6;
+const byte INPUT_VOLTAGE = A7;
+//----End Define PIN Settings------
+
 //----Define OLED Display Settings----
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
@@ -18,22 +37,17 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 //-----End OLED Display Settings------
 
-//----Define Stepper motor library variables and pin outs-------------------------------------------
-const double StepsPerDegree = 3.0;  // Motor step is 1/3 of a degree of rotation
-const unsigned int MaxMotorRotation = 315; // 315 max degrees of movement
-const unsigned int MaxMotorSteps = MaxMotorRotation * StepsPerDegree;
-//SwitecX25 stepper(MaxMotorSteps, 4, 5, 6, 7); // Create the motor object with the maximum steps allowed
-//----Define Stepper motor library variables and pin outs-------------------------------------------
-
 //----Define Display positions----
 #define X_OFFSET 18
 //----End Define Display positions----
 
-//----Define PIN Settings----------
-const byte INPUT_BUTTON = 8; //brake light test button
-const byte INPUT_SPEED = 2; //Interruptable PIN on Nano
-const byte INPUT_TACHO = 3; //Interruptable PIN on Nano
-//----End Define PIN Settings------
+//----Define Stepper motor library variables and pin outs-------------------------------------------
+const double StepsPerDegree = 3.0;  // Motor step is 1/3 of a degree of rotation
+const unsigned int MaxMotorRotation = 315; // 315 max degrees of movement
+const unsigned int MaxMotorSteps = MaxMotorRotation * StepsPerDegree;
+// Create the motor object with the maximum steps allowed
+//SwitecX25 stepper(MaxMotorSteps, STEPPIN_A, STEPPIN_B, STEPPIN_C, STEPPIN_D);
+//----Define Stepper motor library variables and pin outs-------------------------------------------
 
 //----Define other constants-------
 const byte speed_imp_per_rev = 6;
@@ -166,13 +180,16 @@ void setup(void)
     for (;;); // Don't proceed, loop forever
   }
   pinMode(INPUT_SPEED, INPUT_PULLUP);
-  pinMode(INPUT_TACHO, INPUT_PULLUP);
+  pinMode(INPUT_RPM, INPUT_PULLUP);
   pinMode(INPUT_BUTTON, INPUT_PULLUP);
 
   draw_logo();
   display.display();
   delay(1500);
   //  reset_stepper();
+
+  attachInterrupt(digitalPinToInterrupt(INPUT_SPEED), interrupt_speed, RISING);
+  attachInterrupt(digitalPinToInterrupt(INPUT_RPM), interrupt_rpm, RISING);
 
   total = 22357;
   trip = 1457;
@@ -199,6 +216,17 @@ void loop() {
 }
 //-------End of Loop------------------
 
+//-------Start interrupt handling-----
+
+void interrupt_speed() {
+
+}
+
+void interrupt_rpm() {
+  
+}
+
+//-------End interrupt handling-----
 
 //-------Start of Functions-----------
 
@@ -239,6 +267,13 @@ void do_button() {
 }
 
 void gather_data() {
+  int raw_watertemp = analogRead(INPUT_WATERTEMP);
+  int raw_oiltemp = analogRead(INPUT_OILTEMP);
+  int raw_oilpress = analogRead(INPUT_OILPRESS);
+  int raw_lambda = analogRead(INPUT_LAMBDA);
+  int raw_outsidetemp = analogRead(INPUT_OUTSIDETEMP);
+  int raw_voltage = analogRead(INPUT_VOLTAGE);
+
 
 }
 

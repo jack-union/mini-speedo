@@ -1,0 +1,531 @@
+/*
+Speedo with multifunction display
+*/
+
+//----Libraries to Include--------
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+//----End Libraries--------------
+
+//----Define OLED Display Settings----
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+#define OLED_RESET 4
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+//-----End OLED Display Settings------
+
+//----Define Display positions----
+#define X_OFFSET 18
+//----End Define Display positions----
+
+//----Define PIN Settings----------
+const byte INPUT_BUTTON = 8; //brake test button
+const byte INPUT_SPEED = 2; //Interruptable PIN on Nano
+const byte INPUT_TACHO = 3; //Interruptable PIN on Nano
+//----End Define PIN Settings------
+
+//----Define other constants-------
+const byte speed_imp_per_rev = 6;
+const byte ign_imp_per_rev = 2;
+//----End Define other constants---
+
+//----Define Logo-------
+#define LOGO_HEIGHT   48
+#define LOGO_WIDTH    80
+static const unsigned char PROGMEM logo_bmp[] =
+{ B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000,
+
+  B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00000111, B11111111, B11111111, B11111111, B11000000, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00001111, B11111111, B11111111, B11111111, B11110000, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00011100, B00000000, B00000000, B00000000, B00111000, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00111000, B00000000, B00000000, B00000000, B00011100, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00110000, B00000000, B00000000, B00000000, B00001110, B00000000, B00000000,
+
+  B00000000, B00000000, B00000000, B01110000, B00000000, B00000000, B00000000, B00000111, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B01100000, B00000000, B00000000, B00000000, B00000011, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B11000000, B00000000, B00000000, B00000000, B00000011, B10000000, B00000000,
+  B00000000, B00000000, B00000001, B10000000, B00000000, B00000000, B00000000, B00000001, B11000000, B00000000,
+  B00000000, B00000000, B00000111, B10000000, B00000000, B00000000, B00000000, B00000000, B11000000, B00000000,
+  B00000000, B01111111, B11111111, B00000000, B00000000, B00000000, B00000000, B00000000, B01100000, B00000000,
+  B00000001, B11111111, B11111000, B00000000, B00000000, B00000000, B00000000, B00000000, B01110000, B00000000,
+  B00000011, B10000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00111000, B00000000,
+
+  B00000111, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00011100, B00000000,
+  B00000110, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00001100, B00000000,
+  B00000110, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000110, B00000000,
+  B00000110, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000110, B00000000,
+  B00000110, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000111, B00000000,
+  B00000011, B00001111, B00000000, B00000000, B00000000, B00000000, B00000000, B00111110, B00000011, B00000000,
+  B00000011, B00111001, B11000000, B00000000, B00000000, B00000000, B00000000, B01110111, B00000011, B00000000,
+  B00000011, B01100000, B01100000, B00000000, B00000000, B00000000, B00000000, B11000001, B10000011, B00000000,
+
+  B00000011, B01000000, B00100000, B00000000, B00000000, B00000000, B00000001, B10000000, B11000110, B00000000,
+  B00000011, B11000000, B00110000, B00000000, B00000000, B00000000, B00000001, B00000000, B01000110, B00000000,
+  B00000011, B10000000, B00010000, B00000000, B00000000, B00000000, B00000011, B00000000, B01101110, B00000000,
+  B00000001, B10000000, B00011111, B11111111, B11111111, B11111111, B11111111, B00000000, B01111000, B00000000,
+  B00000001, B11000000, B00111111, B11111111, B11111111, B11111111, B11111111, B00000000, B01110000, B00000000,
+  B00000000, B11000000, B00100000, B00000000, B00000000, B00000000, B00000001, B10000000, B11000000, B00000000,
+  B00000000, B01100000, B01100000, B00000000, B00000000, B00000000, B00000000, B11000000, B10000000, B00000000,
+  B00000000, B00110000, B11000000, B00000000, B00000000, B00000000, B00000000, B01100011, B10000000, B00000000,
+
+  B00000000, B00011111, B10000000, B00000000, B00000000, B00000000, B00000000, B00111110, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000,
+  B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000
+};
+//----End Define Logo-------
+
+//-----Variables----------------------
+const int UpdateInterval = 100;  // 100 milliseconds speedo update rate
+uint32_t miles = 0;
+uint32_t trip = 0;
+uint16_t speed = 0;
+uint16_t lambda = 0;
+
+//----End Variables-------------------
+
+//-----Start-up code run once---------
+void setup(void) 
+{
+  Serial.begin(115200);
+
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3c, false)) {
+    Serial.println(F("SSD1306 allocation failed"));
+    for(;;); // Don't proceed, loop forever
+  }
+  pinMode(INPUT_SPEED, INPUT_PULLUP);
+  pinMode(INPUT_TACHO, INPUT_PULLUP);
+  pinMode(INPUT_BUTTON, INPUT_PULLUP);
+  
+//-----Display Logo on start-up
+  display.clearDisplay();
+
+  display.drawBitmap(
+    (display.width()  - LOGO_WIDTH ) / 2,
+    (display.height() - LOGO_HEIGHT) / 2,
+    logo_bmp, LOGO_WIDTH, LOGO_HEIGHT, 1);
+  display.display();
+  delay(10000);
+  display.clearDisplay();
+  display.display();
+//-----End Logo-----------------------
+
+}
+//------End Start-up code-------------
+
+//------Start of Loop-----------------
+void loop() { 
+  uint32_t count = 0;
+
+  display_init("odo");
+  while (count < 100) {
+    count++;
+    display_odo(miles);
+    delay(5);
+    miles += 7;
+    if (miles > 99999) {
+      miles = miles - 100000;
+    }
+  }
+  count = 0;
+
+  display_init("trip");
+  while (count < 100) {
+    count++;
+    display_trip(trip);
+    delay(5);
+    trip += 3;
+    if (trip > 2000) {
+      trip = trip - 2000;
+    }
+  }
+  count = 0;
+
+  display_init("speed");
+  while (count < 100) {
+    count++;
+    display_speed(count*3);
+    delay(5);
+  }
+  count = 0;
+
+  display_init("lambda");
+  while (count < 100) {
+    count++;
+    display_lambda(75+(count/2));
+    delay(5);
+  }
+  count = 0;
+
+  display_init("oil temp");
+  while (count < 100) {
+    count++;
+    display_oil_temp(count+20);
+    delay(5);
+  }
+  count = 0;
+
+  display_init("oil press");
+  while (count < 100) {
+    count++;
+    display_oil_press(count*5);
+    delay(5);
+  }
+  count = 0;
+
+  display_init("voltage");
+  while (count < 100) {
+    count++;
+    display_voltage(90+(count/2));
+    delay(5);
+  }
+  count = 0;
+  
+  display_init("water");
+  while (count < 100) {
+    count++;
+    display_water_temp(55+(count/2));
+    delay(5);
+  }
+  count = 0;
+  
+  display_init("outside");
+  while (count < 100) {
+    count++;
+    display_outside_temp(-12+(count/3));
+    delay(5);
+  }
+  count = 0;
+
+  display_init("rpm");
+  while (count < 100) {
+    count++;
+    display_rpm(800+(count*60));
+    delay(5);
+  }
+  count = 0;
+  
+}
+//-------End of Loop------------------
+
+
+
+//-------Start of Functions-----------
+void display_init(String param) {
+
+  int len;
+  String prt;
+  
+  display.setTextColor(WHITE);
+  display.setTextSize(2);
+    
+  for (int row = 55; row > X_OFFSET; row = row - 4 ) {
+    display.clearDisplay();
+    display.setCursor(row,4);
+    len = ((128-row)/10)-2;
+    prt = param;
+    prt.remove(len);
+    display.println(prt);
+    display.display();
+    delay(5);
+  }
+}
+
+void display_odo(uint32_t readout) {
+
+  char data[8] = "";
+  sprintf(data, "%07d", readout);
+  
+  display.setTextColor(WHITE);
+  display.setTextSize(2);
+
+  display.clearDisplay();
+  display.setCursor(X_OFFSET,4);
+  display.println("odo");
+  
+  display.setTextSize(3);
+  display.setCursor(7,38);
+  
+  display.print(data[1]);
+  display.print(data[2]);
+  display.print(data[3]);
+  display.print(data[4]);
+  display.print(data[5]);
+    
+  display.drawLine(99, 36, 99, 62, WHITE);
+
+  display.setCursor(105,38);
+  display.println(data[6]);
+
+  display.display();
+}
+
+void display_trip(uint32_t readout) {
+
+  char data[8] = "";
+  sprintf(data, "%07d", readout);
+  
+  display.setTextColor(WHITE);
+  display.setTextSize(2);
+
+  display.clearDisplay();
+  display.setCursor(X_OFFSET,4);
+  display.println("trip");
+  
+  display.setTextSize(3);
+  display.setCursor(7,38);
+  
+  if (readout < 100000) {
+    display.print(" ");
+  } else {
+    display.print(data[1]);
+  }
+  if (readout < 10000) {
+    display.print(" ");
+  } else {
+    display.print(data[2]);
+  }
+  if (readout < 1000) {
+    display.print(" ");
+  } else {
+    display.print(data[3]);
+  }
+  if (readout < 100) {
+    display.print(" ");
+  } else {
+    display.print(data[4]);
+  }
+  display.print(data[5]);
+    
+  display.drawLine(99, 36, 99, 62, WHITE);
+
+  display.setCursor(105,38);
+  display.println(data[6]);
+
+  display.display();
+}
+
+void display_speed(uint16_t readout) {
+
+  char data[4] = "";
+  sprintf(data, "%3d", readout);
+  
+  display.setTextColor(WHITE);
+  display.setTextSize(2);
+
+  display.clearDisplay();
+  display.setCursor(X_OFFSET,4);
+  display.println("speed");
+  
+  display.setTextSize(3);
+  display.setCursor(4,38);
+  display.println(data);
+
+  display.setTextSize(2);
+  display.setCursor(75,45);
+  display.println("km/h");
+
+  display.display();
+}
+
+void display_lambda(uint16_t readout) {
+
+  char data[4] = "";
+  sprintf(data, "%03d", readout);
+  
+  display.setTextColor(WHITE);
+  display.setTextSize(2);
+
+  display.clearDisplay();
+  display.setCursor(X_OFFSET,4);
+  display.println("lambda");
+  
+  display.setTextSize(3);
+  display.setCursor(2,38);
+  display.print(data[0]);
+  display.print(".");
+  display.print(data[1]);
+  display.print(data[2]);
+
+  display.setTextSize(2);
+  display.setCursor(80,45);
+  if (readout < 100 ) {
+    display.println("rich");
+  } else {
+    display.println("lean");
+  }
+  
+  display.display();
+}
+
+void display_oil_temp(uint16_t readout) {
+
+  char data[4] = "";
+  sprintf(data, "%3d", readout);
+  
+  display.setTextColor(WHITE);
+  display.setTextSize(2);
+
+  display.clearDisplay();
+  display.setCursor(X_OFFSET,4);
+  display.println("oil temp");
+  
+  display.setTextSize(3);
+  display.setCursor(15,38);
+  display.println(data);
+
+  display.setTextSize(1);
+  display.setCursor(90,45);
+  display.println("O");
+  
+  display.setTextSize(2);
+  display.setCursor(100,45);
+  display.println("C");
+  
+  display.display();
+}
+
+void display_oil_press(uint16_t readout) {
+
+  char data[4] = "";
+  sprintf(data, "%03d", readout);
+  
+  display.setTextColor(WHITE);
+  display.setTextSize(2);
+
+  display.clearDisplay();
+  display.setCursor(X_OFFSET,4);
+  display.println("oil press");
+  
+  display.setTextSize(3);
+  display.setCursor(12,38);
+  display.print(data[0]);
+  display.print(".");
+  display.print(data[1]);
+  display.print(data[2]);
+
+  display.setTextSize(2);
+  display.setCursor(90,45);
+  display.println("bar");
+  
+  display.display();
+}
+
+void display_voltage(uint16_t readout) {
+
+  char data[4] = "";
+  sprintf(data, "%3d", readout);
+  
+  display.setTextColor(WHITE);
+  display.setTextSize(2);
+
+  display.clearDisplay();
+  display.setCursor(X_OFFSET,4);
+  display.println("voltage");
+  
+  display.setTextSize(3);
+  display.setCursor(2,38);
+  display.print(data[0]);
+  display.print(data[1]);
+  display.print(".");
+  display.print(data[2]);
+
+  display.setTextSize(2);
+  display.setCursor(80,45);
+  display.println("volt");
+  
+  display.display();
+}
+
+void display_water_temp(uint16_t readout) {
+
+  char data[4] = "";
+  sprintf(data, "%3d", readout);
+  
+  display.setTextColor(WHITE);
+  display.setTextSize(2);
+
+  display.clearDisplay();
+  display.setCursor(X_OFFSET,4);
+  display.println("water");
+  
+  display.setTextSize(3);
+  display.setCursor(15,38);
+  display.println(data);
+
+  display.setTextSize(1);
+  display.setCursor(90,45);
+  display.println("O");
+  
+  display.setTextSize(2);
+  display.setCursor(100,45);
+  display.println("C");
+  
+  display.display();
+}
+
+void display_outside_temp(int16_t readout) {
+
+  char data[4] = "";
+  sprintf(data, "% 3d", readout);
+  
+  display.setTextColor(WHITE);
+  display.setTextSize(2);
+
+  display.clearDisplay();
+  display.setCursor(X_OFFSET,4);
+  display.println("outside");
+  
+  display.setTextSize(3);
+  display.setCursor(15,38);
+  display.println(data);
+  
+  display.setTextSize(1);
+  display.setCursor(80,45);
+  display.println("O");
+  
+  display.setTextSize(2);
+  display.setCursor(90,45);
+  display.println("C");
+  
+  display.display();
+}
+
+void display_rpm(uint16_t readout) {
+
+  char data[5] = "";
+  sprintf(data, "%4d", readout);
+  
+  display.setTextColor(WHITE);
+  display.setTextSize(2);
+
+  display.clearDisplay();
+  display.setCursor(X_OFFSET,4);
+  display.println("rpm");
+  
+  display.setTextSize(3);
+  display.setCursor(15,38);
+  display.println(data);
+  
+  display.setTextSize(2);
+  display.setCursor(90,45);
+  display.println("rpm");
+  
+  display.display();
+}

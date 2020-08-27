@@ -66,7 +66,7 @@ SwitecX25 stepper(MaxMotorSteps, STEPPIN_A, STEPPIN_B, STEPPIN_C, STEPPIN_D);
 const byte SPEED_IMP_PER_REV = 6;
 const int IMP_PER_KM = 800;  // "Wegstrecke", impulses per 1000m
 const byte RPM_IMP_PER_REV = 2; // SPI/Distributor, set to 1 for MPI
-const int UPDATE_INTERVAL = 100;  // 100 milliseconds speedo update rate
+const int UPDATE_INTERVAL = 100;  // milliseconds speedo update rate
 //----End Define other constants---
 
 //----Display modes----
@@ -179,7 +179,7 @@ uint16_t watertemp = 0;
 uint16_t outsidetemp = 0;
 uint16_t rpm = 0;
 
-byte displayMode = ODO; // Startup setting
+byte displayMode = RPM; // Startup setting
 bool buttonState = HIGH;
 bool buttonBeforeState = HIGH;
 unsigned long timePressed = 0;
@@ -198,8 +198,6 @@ unsigned long speedLastEvent = 0;
 #define MAX_INDEX 5
 byte speedIndex = 0;
 unsigned long speedArray[5];
-byte rpmIndex = 0;
-unsigned long rpmArray[5];
 
 //----End Variables-------------------
 
@@ -296,25 +294,15 @@ void update_speed() {
 
 void update_rpm() {
   //update rpm
-
   if ((millis() - rpmEvent) > ZEROTIME) { //no pulses for ZEROTIME ms?
     rpm = 0;
   } else if ( rpmCount > 0 ) {
-
-
-
-
-    //RPM_IMP_PER_REV
-
-    rpmIndex = next_index(rpmIndex);
-
+    //60000ms in a minute, divided by milliseconds per revolution
+    rpm = (uint16_t)((60000 * rpmCount) / ((rpmEvent - rpmLastEvent) * RPM_IMP_PER_REV ));
+    //prepare for next events
     rpmLastEvent = rpmEvent;
     rpmCount = 0;
   }
-  
-  //Demo
-  rpm = 3120;
-
 }
 
 byte next_index (byte idx) {
@@ -327,12 +315,14 @@ byte next_index (byte idx) {
 
 void reset_stepper() {
   stepper.zero(); //Initialize stepper at 0 location
+  /*
   stepper.setPosition(744);
   stepper.updateBlocking();
   delay (500);
   stepper.setPosition(0);
   stepper.updateBlocking();
   delay (500);
+  */
 }
 
 void do_stepper() {

@@ -179,7 +179,7 @@ uint16_t watertemp = 0;
 uint16_t outsidetemp = 0;
 uint16_t rpm = 0;
 
-byte displayMode = RPM; // Startup setting
+byte displayMode = ODO; // Startup setting
 bool buttonState = HIGH;
 bool buttonBeforeState = HIGH;
 unsigned long timePressed = 0;
@@ -193,11 +193,6 @@ unsigned long rpmLastEvent = 0;
 volatile int speedCount = 0;
 volatile unsigned long speedEvent = 0;
 unsigned long speedLastEvent = 0;
-
-//circular buffer
-#define MAX_INDEX 5
-byte speedIndex = 0;
-unsigned long speedArray[5];
 
 //----End Variables-------------------
 
@@ -252,7 +247,6 @@ void loop() {
 //-------End of Loop------------------
 
 //-------Start interrupt handling-----
-
 void interrupt_speed() {
   speedCount++;
   speedEvent = millis();
@@ -262,35 +256,33 @@ void interrupt_rpm() {
   rpmCount++;
   rpmEvent = millis();
 }
-
 //-------End interrupt handling-----
 
 //-------Start of Functions-----------
 void update_speed() {
   //update total, trip, speed
-  float distance;
+  uint32_t distance;
 
   if (speedCount == 0 and (millis() - speedEvent) > ZEROTIME) { //no pulses for ZEROTIME ms?
     speed = 0;
-  } else if ( speedCount > 0 ) {
+  } else if ( speedCount > 3 ) {
     //speed
-    //(speedEvent - speedLastEvent) / speedCount
+    speed = speedCount * 3600000 / SPEED_IMP_PER_REV / IMP_PER_KM / (speedEvent - speedLastEvent); //speed in kph
 
     //distance
-    distance = speedCount * 1000 / IMP_PER_KM / SPEED_IMP_PER_REV; // distance travelled in meters
+    distance = speedCount * 36 / SPEED_IMP_PER_REV / IMP_PER_KM; // distance travelled in 100meters
+    total = total + distance;
+    trip = trip + distance;
 
-
-
-    speedIndex = next_index(speedIndex);
-
-    speedLastEvent = rpmEvent;
+    //prepare for next events
+    speedLastEvent = speedEvent;
     speedCount = 0;
   }
 
   //Demo
-  total = total + 1;
-  trip = trip + 1;
-  speed = 124;
+  //total = total + 1;
+  //trip = trip + 1;
+  //speed = 124;
 
 }
 
@@ -301,34 +293,27 @@ void update_rpm() {
   } else if ( rpmCount > 0 ) {
     //60000ms in a minute, divided by milliseconds per revolution
     rpm = (uint16_t)((60000 * rpmCount) / ((rpmEvent - rpmLastEvent) * RPM_IMP_PER_REV ));
+
     //prepare for next events
     rpmLastEvent = rpmEvent;
     rpmCount = 0;
   }
 }
 
-byte next_index (byte idx) {
-  idx++;
-  if (idx = MAX_INDEX) {
-    idx = 0;
-  }
-  return idx;
-}
-
 void reset_stepper() {
   stepper.zero(); //Initialize stepper at 0 location
   /*
-  stepper.setPosition(744);
-  stepper.updateBlocking();
-  delay (500);
-  stepper.setPosition(0);
-  stepper.updateBlocking();
-  delay (500);
+    stepper.setPosition(744);
+    stepper.updateBlocking();
+    delay (500);
+    stepper.setPosition(0);
+    stepper.updateBlocking();
+    delay (500);
   */
 }
 
 void do_stepper() {
-  
+
 }
 
 void do_button() {

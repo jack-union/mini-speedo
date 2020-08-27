@@ -30,6 +30,8 @@ const byte INPUT_RPM = 3; //Interruptable PIN on Nano
 #define STEPPIN_C 6
 #define STEPPIN_D 7
 const byte INPUT_BUTTON = 8; //brake light test button
+const byte INPUT_POWER = 11; //Power sense pin
+const byte OUTPUT_POWER = 12; //Power off pin
 
 const byte INPUT_WATERTEMP = A0;
 const byte INPUT_OILTEMP = A1;
@@ -61,8 +63,10 @@ SwitecX25 stepper(MaxMotorSteps, STEPPIN_A, STEPPIN_B, STEPPIN_C, STEPPIN_D);
 //----Define Stepper motor library variables and pin outs-------------------------------------------
 
 //----Define other constants-------
-const byte speed_imp_per_rev = 6;
-const byte ign_imp_per_rev = 2;
+const byte SPEED_IMP_PER_REV = 6;
+const int IMP_PER_KM = 800;  // "Wegstrecke", impulses per 1000m
+const byte RPM_IMP_PER_REV = 2; // SPI/Distributor, set to 1 for MPI
+const int UPDATE_INTERVAL = 100;  // 100 milliseconds speedo update rate
 //----End Define other constants---
 
 //----Display modes----
@@ -158,9 +162,12 @@ static const unsigned char PROGMEM logo_bmp[] =
 };
 //----End Define Logo-------
 
-//-----Variables----------------------
-const int updateInterval = 100;  // 100 milliseconds speedo update rate
+//----EERPOM positions----
+#define EE_TOTAL_POS 0
+#define EE_TRIP_POS 4
+//----End EERPOM positions----
 
+//-----Variables----------------------
 uint32_t total = 0;
 uint32_t trip = 0;
 uint16_t speed = 0;
@@ -170,7 +177,7 @@ uint16_t oilpress = 0;
 uint16_t voltage = 0;
 uint16_t watertemp = 0;
 uint16_t outsidetemp = 0;
-uint16_t rpm = 0;
+volatile uint16_t rpm = 0;
 
 byte displayMode = ODO; // Startup setting
 bool buttonState = HIGH;
@@ -178,6 +185,21 @@ bool buttonBeforeState = HIGH;
 unsigned long timePressed = 0;
 unsigned long displayUpdatedAt = 0;
 bool displayChanged = false;
+
+#define ZEROTIME 1000 //no new interrupt pulses for max ms
+volatile int rpmCount = 0;
+volatile unsigned long rpmEvent = 0;
+unsigned long rpmLastEvent = 0;
+volatile int speedCount = 0;
+volatile unsigned long speedEvent = 0;
+unsigned long speedLastEvent = 0;
+
+//circular buffer
+#define MAX_INDEX 5
+byte speedIndex = 0;
+unsigned long speedArray[5];
+byte rpmIndex = 0;
+unsigned long rpmArray[5];
 
 //----End Variables-------------------
 
@@ -192,6 +214,9 @@ void setup(void) {
   pinMode(INPUT_SPEED, INPUT_PULLUP);
   pinMode(INPUT_RPM, INPUT_PULLUP);
   pinMode(INPUT_BUTTON, INPUT_PULLUP);
+  pinMode(INPUT_POWER, INPUT); //power sense pin
+  pinMode(OUTPUT_POWER, OUTPUT);
+  digitalWrite(OUTPUT_POWER, LOW); //power on
 
   draw_logo();
   display.display();
@@ -201,17 +226,6 @@ void setup(void) {
   attachInterrupt(digitalPinToInterrupt(INPUT_SPEED), interrupt_speed, RISING);
   attachInterrupt(digitalPinToInterrupt(INPUT_RPM), interrupt_rpm, RISING);
 
-  total = 22357;
-  trip = 1457;
-  speed = 124;
-  lambda = 93;
-  oiltemp = 87;
-  oilpress = 450;
-  voltage = 144;
-  watertemp = 88;
-  outsidetemp = 23;
-  rpm = 3120;
-
   Serial.println(F("Setup done."));
 }
 //------End Start-up code-------------
@@ -219,9 +233,20 @@ void setup(void) {
 //------Start of Loop-----------------
 
 void loop() {
+  //check button status
   do_button();
-  gather_data();
-  do_display();
+  //display and data refresh every (UPDATE_INTERVAL) milliseconds
+  if ( (millis() - displayUpdatedAt) > UPDATE_INTERVAL ) {
+    gather_data();
+    update_speed();
+    update_rpm();
+    do_display();
+    do_stepper();
+    displayUpdatedAt = millis();
+  }
+  //switch power supply off and save to eeprom
+  //when power goes down
+  sense_power_off();
 }
 
 //-------End of Loop------------------
@@ -229,16 +254,76 @@ void loop() {
 //-------Start interrupt handling-----
 
 void interrupt_speed() {
-
+  speedCount++;
+  speedEvent = millis();
 }
 
 void interrupt_rpm() {
-
+  rpmCount++;
+  rpmEvent = millis();
 }
 
 //-------End interrupt handling-----
 
 //-------Start of Functions-----------
+void update_speed() {
+  //update total, trip, speed
+  float distance;
+
+  if (speedCount == 0 and (millis() - speedEvent) > ZEROTIME) { //no pulses for ZEROTIME ms?
+    speed = 0;
+  } else if ( speedCount > 0 ) {
+    //speed
+    //(speedEvent - speedLastEvent) / speedCount
+
+    //distance
+    distance = speedCount * 1000 / IMP_PER_KM / SPEED_IMP_PER_REV; // distance travelled in meters
+
+
+
+    speedIndex = next_index(speedIndex);
+
+    speedLastEvent = rpmEvent;
+    speedCount = 0;
+  }
+
+  //Demo
+  total = total + 1;
+  trip = trip + 1;
+  speed = 124;
+
+}
+
+void update_rpm() {
+  //update rpm
+
+  if ((millis() - rpmEvent) > ZEROTIME) { //no pulses for ZEROTIME ms?
+    rpm = 0;
+  } else if ( rpmCount > 0 ) {
+
+
+
+
+    //RPM_IMP_PER_REV
+
+    rpmIndex = next_index(rpmIndex);
+
+    rpmLastEvent = rpmEvent;
+    rpmCount = 0;
+  }
+  
+  //Demo
+  rpm = 3120;
+
+}
+
+byte next_index (byte idx) {
+  idx++;
+  if (idx = MAX_INDEX) {
+    idx = 0;
+  }
+  return idx;
+}
 
 void reset_stepper() {
   stepper.zero(); //Initialize stepper at 0 location
@@ -248,6 +333,10 @@ void reset_stepper() {
   stepper.setPosition(0);
   stepper.updateBlocking();
   delay (500);
+}
+
+void do_stepper() {
+  
 }
 
 void do_button() {
@@ -282,60 +371,80 @@ void gather_data() {
   int raw_outsidetemp = analogRead(INPUT_OUTSIDETEMP);
   int raw_voltage = analogRead(INPUT_VOLTAGE);
 
+  //Demo
+  watertemp = 88;
+  oiltemp = 87;
+  oilpress = 450;
+  lambda = 93;
+  outsidetemp = 23;
+  voltage = 144;
+
+  //do sensor data conversions
 
 }
 
-void do_display() {  
-  //display refresh every (updateInterval) milliseconds
-  if ( (millis() - displayUpdatedAt) > updateInterval ) {
-
-    if (displayMode != MINI) {
-      if (displayChanged) {
-        scroll_mode(displayNames[displayMode]);
-        displayChanged = false;
-      }
-      draw_mode(displayNames[displayMode]);
-    }
-
-    switch (displayMode) {
-      case ODO:
-        draw_odo(total);
-        break;
-      case TRIP:
-        draw_trip(trip);
-        break;
-      case SPEED:
-        draw_speed(speed);
-        break;
-      case LAMBDA:
-        draw_lambda(lambda);
-        break;
-      case OIL_TEMP:
-        draw_oil_temp(oiltemp);
-        break;
-      case OIL_PRESS:
-        draw_oil_press(oilpress);
-        break;
-      case VOLT:
-        draw_voltage(voltage);
-        break;
-      case WATER_TEMP:
-        draw_water_temp(watertemp);
-        break;
-      case OUTSIDE:
-        draw_outside_temp(outsidetemp);
-        break;
-      case RPM:
-        draw_rpm(rpm);
-        break;
-      case MINI:
-        draw_logo();
-        break;
-    }
-    display.display();
-
-    displayUpdatedAt = millis();
+void sense_power_off() {
+  if (digitalRead(INPUT_POWER) == LOW) {
+    draw_goodbye();
+    save_to_eeprom();
+    delay(1000);
+    digitalWrite(OUTPUT_POWER, HIGH);
+    for (;;); // Don't proceed, loop forever
   }
+}
+
+void save_to_eeprom() {
+  //When? At least at stop.
+  //The EEPROM memory has a specified life of 100,000 write/erase cycles
+  //An EEPROM write takes 3.3 ms to complete.
+
+}
+
+void do_display() {
+  if (displayMode != MINI) {
+    if (displayChanged) {
+      scroll_mode(displayNames[displayMode]);
+      displayChanged = false;
+    }
+    draw_mode(displayNames[displayMode]);
+  }
+
+  switch (displayMode) {
+    case ODO:
+      draw_odo(total);
+      break;
+    case TRIP:
+      draw_trip(trip);
+      break;
+    case SPEED:
+      draw_speed(speed);
+      break;
+    case LAMBDA:
+      draw_lambda(lambda);
+      break;
+    case OIL_TEMP:
+      draw_oil_temp(oiltemp);
+      break;
+    case OIL_PRESS:
+      draw_oil_press(oilpress);
+      break;
+    case VOLT:
+      draw_voltage(voltage);
+      break;
+    case WATER_TEMP:
+      draw_water_temp(watertemp);
+      break;
+    case OUTSIDE:
+      draw_outside_temp(outsidetemp);
+      break;
+    case RPM:
+      draw_rpm(rpm);
+      break;
+    case MINI:
+      draw_logo();
+      break;
+  }
+  display.display();
 }
 
 void increment_display () {
@@ -556,4 +665,14 @@ void draw_logo() {
     (display.width()  - LOGO_WIDTH ) / 2,
     (display.height() - LOGO_HEIGHT) / 2,
     logo_bmp, LOGO_WIDTH, LOGO_HEIGHT, 1);
+}
+
+void draw_goodbye() {
+  display.clearDisplay();
+  display.setTextColor(WHITE);
+  display.setTextSize(3);
+  display.setCursor(15, 24);
+  display.println(F("Bye..."));
+
+  display.display();
 }

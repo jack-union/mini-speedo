@@ -242,6 +242,8 @@ void loop() {
     do_stepper();
     displayUpdatedAt = millis();
   }
+  //move stepper towards target position
+  stepper.update();
   //switch power supply off and save to eeprom
   //when power goes down
   sense_power_off();

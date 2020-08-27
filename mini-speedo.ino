@@ -177,7 +177,7 @@ uint16_t oilpress = 0;
 uint16_t voltage = 0;
 uint16_t watertemp = 0;
 uint16_t outsidetemp = 0;
-volatile uint16_t rpm = 0;
+uint16_t rpm = 0;
 
 byte displayMode = ODO; // Startup setting
 bool buttonState = HIGH;

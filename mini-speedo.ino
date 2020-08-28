@@ -168,17 +168,18 @@ static const unsigned char PROGMEM logo_bmp[] =
 //----End EERPOM positions----
 
 //-----Variables----------------------
-uint32_t total = 0;
-uint32_t trip = 0;
-uint16_t speed = 0;
-uint16_t lambda = 0;
-uint16_t oiltemp = 0;
-uint16_t oilpress = 0;
-uint16_t voltage = 0;
-uint16_t watertemp = 0;
-uint16_t outsidetemp = 0;
-uint16_t rpm = 0;
+uint32_t total = 0; //total distance in decimeters
+uint32_t trip = 0; //trip distance in decimeters
+uint16_t speed = 0; //speed in kph
+uint16_t lambda = 0; //lambda factor *100
+uint16_t oiltemp = 0; //temperature in °C
+uint16_t oilpress = 0; //oil pressure in bar *100
+uint16_t voltage = 0; //main voltage in volt *10
+uint16_t watertemp = 0; //temperature in °C
+uint16_t outsidetemp = 0; //temperature in °C
+uint16_t rpm = 0; //revolutions per minute
 
+#define ROLLOVER 1000000000 //100000km in decimeter
 byte displayMode = ODO; // Startup setting
 bool buttonState = HIGH;
 bool buttonBeforeState = HIGH;
@@ -187,10 +188,10 @@ unsigned long displayUpdatedAt = 0;
 bool displayChanged = false;
 
 #define ZEROTIME 1000 //no new interrupt pulses for max ms
-volatile int rpmCount = 0;
+volatile unsigned long rpmCount = 0;
 volatile unsigned long rpmEvent = 0;
 unsigned long rpmLastEvent = 0;
-volatile int speedCount = 0;
+volatile unsigned long speedCount = 0;
 volatile unsigned long speedEvent = 0;
 unsigned long speedLastEvent = 0;
 
@@ -265,25 +266,27 @@ void update_speed() {
 
   if (speedCount == 0 and (millis() - speedEvent) > ZEROTIME) { //no pulses for ZEROTIME ms?
     speed = 0;
-  } else if ( speedCount > 3 ) {
+  } else if ( speedCount > 15 ) { //sample enough events to increase precision
     //speed
-    speed = speedCount * 3600000 / SPEED_IMP_PER_REV / IMP_PER_KM / (speedEvent - speedLastEvent); //speed in kph
+    speed = ((speedCount * 3600000) / SPEED_IMP_PER_REV) / IMP_PER_KM / (speedEvent - speedLastEvent); //speed in kph
 
     //distance
-    distance = speedCount * 36 / SPEED_IMP_PER_REV / IMP_PER_KM; // distance travelled in 100meters
+    distance = ((speedCount * 10000) / SPEED_IMP_PER_REV) / IMP_PER_KM; // distance travelled in decimeters
     total = total + distance;
     trip = trip + distance;
+
+    //roll over
+    if (total > ROLLOVER) {
+      total = total - ROLLOVER;
+    }
+    if (trip > ROLLOVER) {
+      trip = trip - ROLLOVER;
+    }
 
     //prepare for next events
     speedLastEvent = speedEvent;
     speedCount = 0;
   }
-
-  //Demo
-  //total = total + 1;
-  //trip = trip + 1;
-  //speed = 124;
-
 }
 
 void update_rpm() {
@@ -388,10 +391,10 @@ void do_display() {
 
   switch (displayMode) {
     case ODO:
-      draw_odo(total);
+      draw_odo(total/1000); //decimeters to 100m
       break;
     case TRIP:
-      draw_trip(trip);
+      draw_trip(trip/1000); //decimeters to 100m
       break;
     case SPEED:
       draw_speed(speed);

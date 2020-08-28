@@ -326,7 +326,14 @@ void reset_stepper() {
 }
 
 void do_stepper() {
-  stepper.setPosition(speed * STEPS / SPEEDO_RANGE);
+  uint16_t pos;
+
+  pos = speed * STEPS / SPEEDO_RANGE;
+  if (pos >= STEPS) {
+    stepper.setPosition(STEPS-1);
+  } else {
+    stepper.setPosition(speed * STEPS / SPEEDO_RANGE);
+  }
 }
 
 void do_button() {

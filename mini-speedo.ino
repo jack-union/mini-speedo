@@ -160,7 +160,7 @@ static const unsigned char PROGMEM logo_bmp[] =
 
 //----Stepper settings and object----
 // standard X25.168 range 315 degrees at 1/3 degree steps
-#define STEPS (315*3)
+#define STEPS 315*3
 // speedo type
 #define SPEEDO_RANGE 210 //cooper with 210kph full range
 // create the motor object with the maximum steps allowed
@@ -329,11 +329,11 @@ void reset_stepper() {
 void do_stepper() {
   uint16_t pos;
 
-  pos = speed * STEPS / SPEEDO_RANGE;
+  pos = (uint32_t)speed * STEPS / SPEEDO_RANGE;
   if (pos >= STEPS) {
     stepper.setPosition(STEPS - 1);
   } else {
-    stepper.setPosition(speed * STEPS / SPEEDO_RANGE);
+    stepper.setPosition(pos);
   }
 }
 

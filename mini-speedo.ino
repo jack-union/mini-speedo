@@ -263,12 +263,22 @@ void interrupt_rpm() {
 void update_speed() {
   //update total, trip, speed
   uint32_t distance;
+  uint16_t currentSpeed;
+  static byte noUpdateCount;
 
   if (speedCount == 0 and (millis() - speedEvent) > ZEROTIME) { //no pulses for ZEROTIME ms?
     speed = 0;
   } else if ( speedCount > 15 ) { //sample enough events to increase precision
     //speed
-    speed = ((speedCount * 3600000) / SPEED_IMP_PER_REV) / IMP_PER_KM / (speedEvent - speedLastEvent); //speed in kph
+    currentSpeed = ((speedCount * 3600000) / SPEED_IMP_PER_REV) / IMP_PER_KM / (speedEvent - speedLastEvent); //speed in kph
+
+    //calm speed reading
+    if ((abs(currentSpeed - speed) > 2) or (noUpdateCount > 10) ) {
+      speed = currentSpeed;
+      noUpdateCount = 0;
+    } else {
+      noUpdateCount++;
+    }
 
     //distance
     distance = ((speedCount * 10000) / SPEED_IMP_PER_REV) / IMP_PER_KM; // distance travelled in decimeters
@@ -391,10 +401,10 @@ void do_display() {
 
   switch (displayMode) {
     case ODO:
-      draw_odo(total/1000); //decimeters to 100m
+      draw_odo(total / 1000); //decimeters to 100m
       break;
     case TRIP:
-      draw_trip(trip/1000); //decimeters to 100m
+      draw_trip(trip / 1000); //decimeters to 100m
       break;
     case SPEED:
       draw_speed(speed);

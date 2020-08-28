@@ -165,6 +165,7 @@ static const unsigned char PROGMEM logo_bmp[] =
 #define SPEEDO_RANGE 210 //cooper with 210kph full range
 // create the motor object with the maximum steps allowed
 SwitecX25 stepper(STEPS, STEPPIN_A, STEPPIN_B, STEPPIN_C, STEPPIN_D);
+#define SWEEP_AT_START 0
 //----End Stepper settings and object----
 
 //-----Variables----------------------
@@ -315,14 +316,14 @@ void update_rpm() {
 
 void reset_stepper() {
   stepper.zero(); //Initialize stepper at 0 location
-  /*
-    stepper.setPosition(744);
+  if (SWEEP_AT_START) {
+    stepper.setPosition(STEPS - 1);
     stepper.updateBlocking();
     delay (500);
     stepper.setPosition(0);
     stepper.updateBlocking();
     delay (500);
-  */
+  }
 }
 
 void do_stepper() {
@@ -330,7 +331,7 @@ void do_stepper() {
 
   pos = speed * STEPS / SPEEDO_RANGE;
   if (pos >= STEPS) {
-    stepper.setPosition(STEPS-1);
+    stepper.setPosition(STEPS - 1);
   } else {
     stepper.setPosition(speed * STEPS / SPEEDO_RANGE);
   }

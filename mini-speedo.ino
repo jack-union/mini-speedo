@@ -179,7 +179,7 @@ uint16_t watertemp = 0; //temperature in °C
 uint16_t outsidetemp = 0; //temperature in °C
 uint16_t rpm = 0; //revolutions per minute
 
-#define ROLLOVER 10^6 * 1000 * 10 //100000km in decimeter
+#define ROLLOVER 1000000000 //100000km in decimeter
 byte displayMode = ODO; // Startup setting
 bool buttonState = HIGH;
 bool buttonBeforeState = HIGH;

@@ -54,14 +54,6 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define X_OFFSET 18
 //----End Define Display positions----
 
-//----Define Stepper motor library variables and pin outs-------------------------------------------
-const double StepsPerDegree = 3.0;  // Motor step is 1/3 of a degree of rotation
-const unsigned int MaxMotorRotation = 315; // 315 max degrees of movement
-const unsigned int MaxMotorSteps = MaxMotorRotation * StepsPerDegree;
-// Create the motor object with the maximum steps allowed
-SwitecX25 stepper(MaxMotorSteps, STEPPIN_A, STEPPIN_B, STEPPIN_C, STEPPIN_D);
-//----Define Stepper motor library variables and pin outs-------------------------------------------
-
 //----Define other constants-------
 const byte SPEED_IMP_PER_REV = 6;
 const int IMP_PER_KM = 800;  // "Wegstrecke", impulses per 1000m
@@ -100,7 +92,6 @@ const char *displayNames[] = {
   "mini"
 };
 //----End Display mode names----
-
 
 //----Define Logo-------
 #define LOGO_HEIGHT   48
@@ -167,6 +158,15 @@ static const unsigned char PROGMEM logo_bmp[] =
 #define EE_TRIP_POS 4
 //----End EERPOM positions----
 
+//----Stepper settings and object----
+// standard X25.168 range 315 degrees at 1/3 degree steps
+#define STEPS (315*3)
+// speedo type
+#define SPEEDO_RANGE 210 //cooper with 210kph full range
+// create the motor object with the maximum steps allowed
+SwitecX25 stepper(STEPS, STEPPIN_A, STEPPIN_B, STEPPIN_C, STEPPIN_D);
+//----End Stepper settings and object----
+
 //-----Variables----------------------
 uint32_t total = 0; //total distance in decimeters
 uint32_t trip = 0; //trip distance in decimeters
@@ -179,7 +179,7 @@ uint16_t watertemp = 0; //temperature in °C
 uint16_t outsidetemp = 0; //temperature in °C
 uint16_t rpm = 0; //revolutions per minute
 
-#define ROLLOVER 1000000000 //100000km in decimeter
+#define ROLLOVER 10^6 * 1000 * 10 //100000km in decimeter
 byte displayMode = ODO; // Startup setting
 bool buttonState = HIGH;
 bool buttonBeforeState = HIGH;
@@ -326,7 +326,7 @@ void reset_stepper() {
 }
 
 void do_stepper() {
-
+  stepper.setPosition(speed * STEPS / SPEEDO_RANGE);
 }
 
 void do_button() {
@@ -658,9 +658,9 @@ void draw_logo() {
 }
 
 void draw_goodbye() {
-  display.clearDisplay();
+  draw_logo();
   display.setTextColor(WHITE);
-  display.setTextSize(3);
+  display.setTextSize(2);
   display.setCursor(15, 24);
   display.println(F("Bye..."));
 

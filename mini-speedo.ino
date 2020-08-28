@@ -19,7 +19,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include "SwitecX25.h"
-#include <EEPROM.h>
+#include <EEPROMex.h>
 //----End Libraries--------------
 
 //----Define PIN Settings----------
@@ -154,8 +154,10 @@ static const unsigned char PROGMEM logo_bmp[] =
 //----End Define Logo-------
 
 //----EERPOM positions----
-#define EE_TOTAL_POS 0
-#define EE_TRIP_POS 4
+#define EE_TOKEN_POS 0
+#define EE_TOKEN_PATTERN 170 // 10101010
+#define EE_TOTAL_POS 1
+#define EE_TRIP_POS 5
 //----End EERPOM positions----
 
 //----Stepper settings and object----
@@ -220,6 +222,9 @@ void setup(void) {
 
   attachInterrupt(digitalPinToInterrupt(INPUT_SPEED), interrupt_speed, RISING);
   attachInterrupt(digitalPinToInterrupt(INPUT_RPM), interrupt_rpm, RISING);
+
+  EEPROM.setMemPool(0, EEPROMSizeNano);
+  load_from_eeprom();
 
   Serial.println(F("Setup done."));
 }
@@ -385,9 +390,21 @@ void sense_power_off() {
   if (digitalRead(INPUT_POWER) == LOW) {
     draw_goodbye();
     save_to_eeprom();
+    stepper.setPosition(0);
+    stepper.updateBlocking();
     delay(1000);
     digitalWrite(OUTPUT_POWER, HIGH);
     for (;;); // Don't proceed, loop forever
+  }
+}
+
+void load_from_eeprom() {
+  if (EEPROM.readByte(EE_TOKEN_POS) == EE_TOKEN_PATTERN) { //found pattern?
+    total = EEPROM.readLong(EE_TOTAL_POS);
+    trip = EEPROM.readLong(EE_TRIP_POS);
+  } else { //first start, save zero values
+    EEPROM.writeByte(EE_TOKEN_POS, EE_TOKEN_PATTERN);
+    save_to_eeprom();
   }
 }
 
@@ -395,7 +412,8 @@ void save_to_eeprom() {
   //When? At least at stop.
   //The EEPROM memory has a specified life of 100,000 write/erase cycles
   //An EEPROM write takes 3.3 ms to complete.
-
+  EEPROM.updateLong(EE_TOTAL_POS, total);
+  EEPROM.updateLong(EE_TRIP_POS, trip);
 }
 
 void do_display() {
@@ -668,8 +686,8 @@ void draw_logo() {
 void draw_goodbye() {
   draw_logo();
   display.setTextColor(WHITE);
-  display.setTextSize(2);
-  display.setCursor(15, 24);
+  display.setTextSize(1);
+  display.setCursor(5, 5);
   display.println(F("Bye..."));
 
   display.display();

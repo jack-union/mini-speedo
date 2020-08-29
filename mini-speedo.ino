@@ -206,7 +206,7 @@ void setup(void) {
 
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3c, false)) {
     Serial.println(F("SSD1306 allocation failed"));
-    for (;;); // Don't proceed, loop forever
+    stop();
   }
   pinMode(INPUT_SPEED, INPUT_PULLUP);
   pinMode(INPUT_RPM, INPUT_PULLUP);
@@ -394,7 +394,7 @@ void sense_power_off() {
     stepper.updateBlocking();
     delay(1000);
     digitalWrite(OUTPUT_POWER, HIGH);
-    for (;;); // Don't proceed, loop forever
+    stop();
   }
 }
 
@@ -692,4 +692,8 @@ void draw_goodbye() {
   display.println(F("Bye..."));
 
   display.display();
+}
+
+void  stop() {
+  for (;;); // Don't proceed, loop forever
 }

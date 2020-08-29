@@ -30,8 +30,11 @@ const byte INPUT_RPM = 3; //Interruptable PIN on Nano
 #define STEPPIN_C 6
 #define STEPPIN_D 7
 const byte INPUT_BUTTON = 8; //brake light test button
+//D9
+//D10
 const byte INPUT_POWER = 11; //Power sense pin
 const byte OUTPUT_POWER = 12; //Power off pin
+//D13
 
 const byte INPUT_WATERTEMP = A0;
 const byte INPUT_OILTEMP = A1;
@@ -137,7 +140,6 @@ unsigned long rpmLastEvent = 0;
 volatile unsigned long speedCount = 0;
 volatile unsigned long speedEvent = 0;
 unsigned long speedLastEvent = 0;
-
 //----End Variables-------------------
 
 //-----Start-up code run once---------
@@ -171,7 +173,6 @@ void setup(void) {
 //------End Start-up code-------------
 
 //------Start of Loop-----------------
-
 void loop() {
   //check button status
   do_button();
@@ -190,7 +191,6 @@ void loop() {
   //when power goes down
   sense_power_off();
 }
-
 //-------End of Loop------------------
 
 //-------Start interrupt handling-----
@@ -206,7 +206,6 @@ void interrupt_rpm() {
 //-------End interrupt handling-----
 
 //-------Start of Functions-----------
-
 void do_button() {
   buttonState = digitalRead(INPUT_BUTTON);
   if (buttonState == LOW) {
@@ -262,6 +261,6 @@ void save_to_eeprom() {
   EEPROM.updateLong(EE_TRIP_POS, trip);
 }
 
-void  stop() {
+void stop() {
   for (;;); // Don't proceed, loop forever
 }

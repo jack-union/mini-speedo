@@ -404,7 +404,8 @@ void load_from_eeprom() {
     trip = EEPROM.readLong(EE_TRIP_POS);
   } else { //first start, save zero values
     EEPROM.writeByte(EE_TOKEN_POS, EE_TOKEN_PATTERN);
-    save_to_eeprom();
+    EEPROM.writeLong(EE_TOTAL_POS, 0);
+    EEPROM.writeLong(EE_TRIP_POS, 0);
   }
 }
 

@@ -2,7 +2,7 @@
  * Logo definition
  * 
  */
- 
+
 //----Define Logo-------
 #define LOGO_HEIGHT   48
 #define LOGO_WIDTH    80

@@ -12,10 +12,10 @@ void gather_data() {
   int raw_voltage = analogRead(INPUT_VOLTAGE);
 
   //Demo
-  watertemp = 88;
-  oiltemp = 87;
+  watertemp = 93;
+  oiltemp = 122;
   oilpress = 450;
-  lambda = 93;
+  lambda = 97;
   outsidetemp = 23;
   voltage = 144;
 

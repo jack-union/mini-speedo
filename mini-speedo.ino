@@ -56,7 +56,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 //-----End OLED Display Settings------
 
 //----Define Display positions----
-#define X_OFFSET 18
+#define X_OFFSET 10
 //----End Define Display positions----
 
 //----Define other constants-------
@@ -107,7 +107,7 @@ const char *displayNames[] = {
 
 //----Stepper settings and object----
 // standard X25.168 range 315 degrees at 1/3 degree steps
-#define STEPS 250*3
+#define STEPS 265*3
 // speedo type
 #define SPEEDO_RANGE 210 //cooper with 210kph full range
 // create the motor object with the maximum steps allowed

@@ -25,10 +25,10 @@
 //----Define PIN Settings----------
 const byte INPUT_SPEED = 2; //Interruptable PIN on Nano
 const byte INPUT_RPM = 3; //Interruptable PIN on Nano
-#define STEPPIN_A 4
-#define STEPPIN_B 5
-#define STEPPIN_C 6
-#define STEPPIN_D 7
+#define STEPPIN_1 4 //back view top right pin
+#define STEPPIN_2 5 //back view bottom right pin
+#define STEPPIN_3 6 //back view bottom left pin
+#define STEPPIN_4 7 //back view top left pin
 const byte INPUT_BUTTON = 8; //brake light test button
 //D9
 //D10
@@ -109,7 +109,7 @@ const char *displayNames[] = {
 // speedo type
 #define SPEEDO_RANGE 210 //cooper with 210kph full range
 // create the motor object with the maximum steps allowed
-SwitecX25 stepper(STEPS, STEPPIN_A, STEPPIN_B, STEPPIN_C, STEPPIN_D);
+SwitecX25 stepper(STEPS, STEPPIN_1, STEPPIN_2, STEPPIN_3, STEPPIN_4);
 #define SWEEP_AT_START 0
 //----End Stepper settings and object----
 

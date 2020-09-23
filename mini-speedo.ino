@@ -22,6 +22,7 @@
 #include <Fonts/FreeSansBold18pt7b.h>
 #include "SwitecX25.h"
 #include <EEPROMex.h>
+#include <avr/wdt.h>
 //----End Libraries--------------
 
 //----Define PIN Settings----------
@@ -146,6 +147,9 @@ unsigned long speedLastEvent = 0;
 
 //-----Start-up code run once---------
 void setup(void) {
+  MCUSR = 0; // clear status register
+  wdt_disable(); // watchdog disable
+
   Serial.begin(115200);
 
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3c, false)) {
@@ -264,5 +268,7 @@ void save_to_eeprom() {
 }
 
 void stop() {
-  for (;;); // Don't proceed, loop forever
+  delay(1000); // wait a second
+  wdt_enable( WDTO_15MS); // enable watchdog
+  for (;;); // are we still there? wait for watchdog to reset us.
 }

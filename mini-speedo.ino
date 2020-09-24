@@ -33,11 +33,11 @@ const byte INPUT_RPM = 3; //Interruptable PIN on Nano
 #define STEPPIN_3 6 //back view bottom left pin
 #define STEPPIN_4 7 //back view top left pin
 const byte INPUT_BUTTON = 8; //brake light test button
-//D9
-//D10
+#define SERIAL_RX 9 // D9 lambda digital serial input
+#define SERIAL_TX 10 // D10 lambda digital serial input
 const byte INPUT_POWER = 11; //Power sense pin
 const byte OUTPUT_POWER = 12; //Power off pin
-//D13
+const byte OUTPUT_WARN = 13; //D13 warn light out
 
 const byte INPUT_WATERTEMP = A0;
 const byte INPUT_OILTEMP = A1;
@@ -162,6 +162,8 @@ void setup(void) {
   pinMode(INPUT_POWER, INPUT); //power sense pin
   pinMode(OUTPUT_POWER, OUTPUT);
   digitalWrite(OUTPUT_POWER, LOW); //power on
+  pinMode(OUTPUT_WARN, OUTPUT);
+  digitalWrite(OUTPUT_WARN, LOW); //warning off
 
   draw_logo();
   display.display();

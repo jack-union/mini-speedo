@@ -1,3 +1,5 @@
+![mainimage](https://github.com/jack-union/mini-speedo/blob/master/images/main.png)
+
 # mini-speedo
 Electronic Speedo for classic minis
 

@@ -14,12 +14,8 @@
 */
 
 //----Libraries to Include--------
-#include <SPI.h>
 #include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-#include <Fonts/FreeSans12pt7b.h>
-#include <Fonts/FreeSansBold18pt7b.h>
+#include <U8g2lib.h>
 #include "SwitecX25.h"
 #include <EEPROMex.h>
 #include <avr/wdt.h>
@@ -52,8 +48,10 @@ const byte INPUT_VOLTAGE = A7;
 //----Define OLED Display Settings----
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
-#define OLED_RESET 4
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+//1,3" SH1106 display
+U8G2_SH1106_128X64_NONAME_1_HW_I2C display(U8G2_R0);
+//0,96" SSD1306 display
+//U8G2_SSD1306_128X64_NONAME_1_HW_I2C display(U8G2_R0);
 //-----End OLED Display Settings------
 
 //----Define Display positions----
@@ -95,7 +93,7 @@ const char *displayNames[] = {
   "water",
   "outside",
   "rpm",
-  "mini"
+  "" //no text in logo mode
 };
 //----End Display mode names----
 
@@ -152,10 +150,10 @@ void setup(void) {
 
   Serial.begin(115200);
 
-  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3c, false)) {
-    Serial.println(F("SSD1306 allocation failed"));
-    stop();
-  }
+  display.begin();
+  display.setDrawColor(1);
+  display.setFontMode(0);
+
   pinMode(INPUT_SPEED, INPUT_PULLUP);
   pinMode(INPUT_RPM, INPUT_PULLUP);
   pinMode(INPUT_BUTTON, INPUT_PULLUP);
@@ -165,8 +163,10 @@ void setup(void) {
   pinMode(OUTPUT_WARN, OUTPUT);
   digitalWrite(OUTPUT_WARN, LOW); //warning off
 
-  draw_logo();
-  display.display();
+  display.firstPage();
+  do {
+    draw_logo();
+  } while ( display.nextPage() );
   delay(1500);
   reset_stepper();
 

@@ -97,11 +97,6 @@ $EndComp
 Connection ~ 1200 1350
 Wire Wire Line
 	1200 1350 800  1350
-Connection ~ 2500 1150
-Wire Wire Line
-	2400 1150 2500 1150
-Wire Wire Line
-	2500 1350 2500 1150
 $Comp
 L Regulator_Switching:LM2596T-5 U1
 U 1 1 5F47E73E
@@ -113,19 +108,6 @@ F 3 "http://www.ti.com/lit/ds/symlink/lm2596.pdf" H 3500 1050 50  0001 C CNN
 	1    3500 1050
 	1    0    0    -1  
 $EndComp
-$Comp
-L Device:R R3
-U 1 1 5F48AB45
-P 2500 1500
-F 0 "R3" H 2570 1546 50  0000 L CNN
-F 1 "10k" H 2570 1455 50  0000 L CNN
-F 2 "" V 2430 1500 50  0001 C CNN
-F 3 "~" H 2500 1500 50  0001 C CNN
-	1    2500 1500
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	2500 1650 2500 3450
 Wire Wire Line
 	5850 4550 5750 4550
 Connection ~ 5750 4550
@@ -148,8 +130,6 @@ Wire Wire Line
 	4000 950  5950 950 
 Wire Wire Line
 	5950 950  5950 1150
-Wire Wire Line
-	2500 1150 2750 1150
 $Comp
 L Motor:Stepper_Motor_bipolar M1
 U 1 1 5F4A9B99
@@ -479,10 +459,6 @@ Wire Wire Line
 	8500 1300 8550 1300
 Wire Wire Line
 	8550 1400 8500 1400
-Wire Bus Line
-	8400 1200 8400 1750
-Wire Bus Line
-	5100 1750 5100 2850
 Entry Wire Line
 	8500 1100 8400 1200
 Wire Bus Line
@@ -498,4 +474,28 @@ F 3 "~" H 8750 1200 50  0001 C CNN
 	1    8750 1200
 	-1   0    0    -1  
 $EndComp
+Wire Wire Line
+	2400 1150 2500 1150
+$Comp
+L Diode:1N4148 D?
+U 1 1 5F9CBE2A
+P 2500 1550
+F 0 "D?" V 2546 1470 50  0000 R CNN
+F 1 "1N4148" V 2455 1470 50  0000 R CNN
+F 2 "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal" H 2500 1375 50  0001 C CNN
+F 3 "https://assets.nexperia.com/documents/data-sheet/1N4148_1N4448.pdf" H 2500 1550 50  0001 C CNN
+	1    2500 1550
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	2500 1400 2500 1150
+Connection ~ 2500 1150
+Wire Wire Line
+	2500 1150 2750 1150
+Wire Wire Line
+	2500 1700 2500 3450
+Wire Bus Line
+	8400 1200 8400 1750
+Wire Bus Line
+	5100 1750 5100 2850
 $EndSCHEMATC

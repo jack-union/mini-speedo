@@ -54,16 +54,22 @@ U8G2_SH1106_128X64_NONAME_1_HW_I2C display(U8G2_R0);
 //U8G2_SSD1306_128X64_NONAME_1_HW_I2C display(U8G2_R0);
 //-----End OLED Display Settings------
 
-//----Define Display positions----
-#define X_OFFSET 10
-//----End Define Display positions----
-
 //----Define other constants-------
 const byte SPEED_IMP_PER_REV = 6;
 const int IMP_PER_KM = 800;  // "Wegstrecke", impulses per 1000m
 const byte RPM_IMP_PER_REV = 2; // SPI/Distributor, set to 1 for MPI
 const int UPDATE_INTERVAL = 100;  // milliseconds speedo update rate
 //----End Define other constants---
+
+//----Stepper settings and object----
+// standard X25.168 range 315 degrees at 1/3 degree steps
+#define STEPS 265*3
+// speedo type
+#define SPEEDO_RANGE 210 //cooper with 210kph full range
+// create the motor object with the maximum steps allowed
+SwitecX25 stepper(STEPS, STEPPIN_1, STEPPIN_2, STEPPIN_3, STEPPIN_4);
+#define SWEEP_AT_START 1
+//----End Stepper settings and object----
 
 //----Display modes----
 #define ODO 0
@@ -97,22 +103,16 @@ const char *displayNames[] = {
 };
 //----End Display mode names----
 
+//----Define Display positions----
+#define X_OFFSET 10
+//----End Define Display positions----
+
 //----EERPOM positions----
 #define EE_TOKEN_POS 0
 #define EE_TOKEN_PATTERN 170 // 10101010
 #define EE_TOTAL_POS 1
 #define EE_TRIP_POS 5
 //----End EERPOM positions----
-
-//----Stepper settings and object----
-// standard X25.168 range 315 degrees at 1/3 degree steps
-#define STEPS 265*3
-// speedo type
-#define SPEEDO_RANGE 210 //cooper with 210kph full range
-// create the motor object with the maximum steps allowed
-SwitecX25 stepper(STEPS, STEPPIN_1, STEPPIN_2, STEPPIN_3, STEPPIN_4);
-#define SWEEP_AT_START 1
-//----End Stepper settings and object----
 
 //-----Variables----------------------
 uint32_t total = 0; //total distance in decimeters

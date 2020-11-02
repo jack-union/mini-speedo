@@ -2,8 +2,8 @@
    display functions
 
 */
-#define SMALL_FONT u8g2_font_profont22_mf
-#define LARGE_FONT u8g2_font_profont29_mf
+#define SMALL_FONT u8g2_font_logisoso18_tf
+#define LARGE_FONT u8g2_font_logisoso24_tf
 
 void do_display() {
   if (displayMode != MINI) {

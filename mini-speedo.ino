@@ -45,6 +45,11 @@ const byte INPUT_OUTSIDETEMP = A6;
 const byte INPUT_VOLTAGE = A7;
 //----End Define PIN Settings------
 
+//----Define Lambda sensor input----
+//#define LAMBDA_DIGITAL true //RX and TX serial pins
+#define LAMBDA_DIGITAL false //analog 5V input
+//----End Define Lambda sensor input----
+
 //----Define OLED Display Settings----
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
@@ -173,7 +178,7 @@ void setup(void) {
   attachInterrupt(digitalPinToInterrupt(INPUT_SPEED), interrupt_speed, RISING);
   attachInterrupt(digitalPinToInterrupt(INPUT_RPM), interrupt_rpm, RISING);
 
-  EEPROM.setMemPool(0, EEPROMSizeNano);
+  EEPROM.setMemPool(0, EEPROMSizeNano); //set memory size
   load_from_eeprom();
 
   Serial.println(F("Setup done."));

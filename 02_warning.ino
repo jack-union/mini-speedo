@@ -4,6 +4,8 @@
  */
 
 //----Define Warning Logo-------
+#define WARNING_X_POS 100
+#define WARNING_Y_POS 15
 #define WARNING_HEIGHT 18
 #define WARNING_WIDTH 20
 

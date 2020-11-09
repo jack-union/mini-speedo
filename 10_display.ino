@@ -13,6 +13,8 @@ void do_display() {
     }
   }
 
+  check_warnings();
+
   display.firstPage();
   do {
     draw_mode(displayNames[displayMode]);
@@ -176,6 +178,10 @@ void draw_oil_temp(uint16_t readout) {
   display.setCursor(85, 60);
   display.println(char(0xb0)); //ASCII "degrees" symbol
   display.println("C");
+
+  if ( warningOiltemp ) {
+    draw_warning();
+  }
 }
 
 void draw_oil_press(uint16_t readout) {
@@ -192,6 +198,10 @@ void draw_oil_press(uint16_t readout) {
   display.setFont(SMALL_FONT);
   display.setCursor(85, 60);
   display.println("bar");
+
+  if ( warningOilpress ) {
+    draw_warning();
+  }
 }
 
 void draw_voltage(uint16_t readout) {
@@ -208,6 +218,10 @@ void draw_voltage(uint16_t readout) {
   display.setFont(SMALL_FONT);
   display.setCursor(80, 60);
   display.println("volt");
+
+  if ( warningVoltage ) {
+    draw_warning();
+  }
 }
 
 void draw_water_temp(uint16_t readout) {
@@ -222,6 +236,10 @@ void draw_water_temp(uint16_t readout) {
   display.setCursor(85, 60);
   display.println(char(0xb0)); //ASCII "degrees" symbol
   display.println("C");
+
+  if ( warningVoltage ) {
+    draw_warning();
+  }
 }
 
 void draw_outside_temp(int16_t readout) {
@@ -236,6 +254,9 @@ void draw_outside_temp(int16_t readout) {
   display.setCursor(85, 60);
   display.println(char(0xb0)); //ASCII "degrees" symbol
   display.println("C");
+  if ( warningOutsidetemp ) {
+    draw_warning();
+  }
 }
 
 void draw_rpm(uint16_t readout) {
@@ -256,6 +277,14 @@ void draw_logo() {
     (SCREEN_HEIGHT - LOGO_HEIGHT) / 2,
     LOGO_WIDTH, LOGO_HEIGHT,
     logo_bmp);
+}
+
+void draw_warning() {
+  display.drawXBMP(
+    WARNING_X_POS,
+    WARNING_Y_POS,
+    WARNING_WIDTH, WARNING_HEIGHT,
+    warning_bmp);
 }
 
 void draw_goodbye() {

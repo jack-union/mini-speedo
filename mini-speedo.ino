@@ -50,6 +50,15 @@ const byte INPUT_VOLTAGE = A7;
 #define LAMBDA_DIGITAL false //analog 5V input
 //----End Define Lambda sensor input----
 
+//----Define warning limits----
+#define WARN_MAX_OILTEMP 120 // 120° Celsius
+#define WARN_MIN_OILPRESS 100 // 1 bar pressure
+#define WARN_MIN_VOLTAGE 118 // 11.8 Volts
+#define WARN_MAX_WATERTEMP 100 // 100° Celsius
+#define WARN_MIN_OUTSIDETEMP 2 // 2° Celsius
+
+//----End Define warning limits----
+
 //----Define OLED Display Settings----
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
@@ -130,6 +139,12 @@ uint16_t voltage = 0; //main voltage in volt *10
 uint16_t watertemp = 0; //temperature in °C
 uint16_t outsidetemp = 0; //temperature in °C
 uint16_t rpm = 0; //revolutions per minute
+
+bool warningOiltemp = false;
+bool warningOilpress = false;
+bool warningVoltage = false;
+bool warningWatertemp = false;
+bool warningOutsidetemp = false;
 
 #define ROLLOVER 1000000000 //100000km in decimeter
 byte displayMode = ODO; // Startup setting

@@ -63,9 +63,9 @@ const byte INPUT_VOLTAGE = A7;
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 //1,3" SH1106 display
-U8G2_SH1106_128X64_NONAME_1_HW_I2C display(U8G2_R0);
+//U8G2_SH1106_128X64_NONAME_1_HW_I2C display(U8G2_R0);
 //0,96" SSD1306 display
-//U8G2_SSD1306_128X64_NONAME_1_HW_I2C display(U8G2_R0);
+U8G2_SSD1306_128X64_NONAME_1_HW_I2C display(U8G2_R0);
 //-----End OLED Display Settings------
 
 //----Define other constants-------
@@ -141,7 +141,7 @@ uint16_t outsidetemp = 0; //temperature in °C
 uint16_t rpm = 0; //revolutions per minute
 
 bool warningOiltemp = false;
-bool warningOilpress = false;
+bool warningOilpress = true; // probably no oil pressure at startup
 bool warningVoltage = false;
 bool warningWatertemp = false;
 bool warningOutsidetemp = false;

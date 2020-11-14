@@ -261,10 +261,13 @@ void do_button() {
 
 void sense_power_off() {
   if (digitalRead(INPUT_POWER) == LOW) {
-    draw_goodbye();
     save_to_eeprom();
     stepper.setPosition(0);
     stepper.updateBlocking();
+    display.firstPage();
+    do {
+      draw_goodbye();
+    } while ( display.nextPage() );
     delay(1000);
     digitalWrite(OUTPUT_POWER, HIGH);
     stop();

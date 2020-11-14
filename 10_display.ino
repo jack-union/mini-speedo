@@ -288,8 +288,7 @@ void draw_warning() {
 }
 
 void draw_goodbye() {
-  draw_logo();
   display.setFont(SMALL_FONT);
-  display.setCursor(5, 5);
+  display.setCursor(48, 36);
   display.println(F("Bye."));
 }

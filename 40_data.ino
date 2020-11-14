@@ -13,8 +13,8 @@ void gather_data() {
 
   //Demo
   watertemp = 93;
-  oiltemp = 122;
-  oilpress = 70;
+  oiltemp = 108;
+  oilpress = 450;
   //lambda = 97;
   raw_lambda = 375; // 0.92
   outsidetemp = 23;
@@ -42,6 +42,7 @@ void gather_data() {
 
 void check_warnings () {
   byte switchDisplayTo = 255;
+  bool setWarningOutput = false;
 
   if ( outsidetemp < WARN_MIN_OUTSIDETEMP ) {
     if ( !warningOutsidetemp ) { // new warning
@@ -54,6 +55,7 @@ void check_warnings () {
 
   if ( (voltage < WARN_MIN_VOLTAGE) ||
        (voltage > WARN_MAX_VOLTAGE) ) {
+    setWarningOutput = true;
     if ( !warningVoltage ) { // new warning
       switchDisplayTo = VOLT;
       warningVoltage = true;
@@ -63,6 +65,7 @@ void check_warnings () {
   }
 
   if ( oiltemp > WARN_MAX_OILTEMP ) {
+    setWarningOutput = true;
     if ( !warningOiltemp ) { // new warning
       switchDisplayTo = OIL_TEMP;
       warningOiltemp = true;
@@ -72,6 +75,7 @@ void check_warnings () {
   }
 
   if ( watertemp > WARN_MAX_WATERTEMP ) {
+    setWarningOutput = true;
     if ( !warningWatertemp ) { // new warning
       switchDisplayTo = WATER_TEMP;
       warningWatertemp = true;
@@ -81,6 +85,7 @@ void check_warnings () {
   }
 
   if ( oilpress < WARN_MIN_OILPRESS ) {
+    setWarningOutput = true;
     if ( !warningOilpress ) { // new warning
       switchDisplayTo = OIL_PRESS;
       warningOilpress = true;
@@ -92,4 +97,6 @@ void check_warnings () {
   if ( switchDisplayTo != 255 ) { // we found a new warning condition
     displayMode = switchDisplayTo; // switch to sensor with warning
   }
+  digitalWrite(OUTPUT_WARN, setWarningOutput); // set warning lamp
+
 }

@@ -19,7 +19,7 @@ void gather_data() {
   raw_lambda = 375; // 0.92
   outsidetemp = 23;
   //voltage = 144;
-  raw_voltage = 707; // 13.8V
+  //raw_voltage = 707; // 13.8V
 
 
   //do sensor data conversions
@@ -34,7 +34,7 @@ void gather_data() {
   }
 
   // Voltage
-  //voltage divider 1:4 connected to Vbat, limited to 4,7V => max 18,8V
+  // voltage divider 1:4 connected to Vbat, limited to 4,7V => max 18,8V
   // 1024 == 5V, 512 == 2.5V resp 10V Vbat resp voltage value 100.
   voltage = raw_voltage * 50 / 256;
 
@@ -52,7 +52,8 @@ void check_warnings () {
     warningOutsidetemp = false; // reset warning
   }
 
-  if ( voltage < WARN_MIN_VOLTAGE ) {
+  if ( (voltage < WARN_MIN_VOLTAGE) ||
+       (voltage > WARN_MAX_VOLTAGE) ) {
     if ( !warningVoltage ) { // new warning
       switchDisplayTo = VOLT;
       warningVoltage = true;

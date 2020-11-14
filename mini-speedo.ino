@@ -54,6 +54,7 @@ const byte INPUT_VOLTAGE = A7;
 #define WARN_MAX_OILTEMP 120 // 120° Celsius
 #define WARN_MIN_OILPRESS 100 // 1 bar pressure
 #define WARN_MIN_VOLTAGE 118 // 11.8 Volts
+#define WARN_MAX_VOLTAGE 154 // 15.4 Volts
 #define WARN_MAX_WATERTEMP 100 // 100° Celsius
 #define WARN_MIN_OUTSIDETEMP 2 // 2° Celsius
 

@@ -268,7 +268,7 @@ void sense_power_off() {
     do {
       draw_goodbye();
     } while ( display.nextPage() );
-    delay(1000);
+    delay(2000);
     digitalWrite(OUTPUT_POWER, HIGH);
     stop();
   }

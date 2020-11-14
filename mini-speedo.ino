@@ -28,9 +28,9 @@ const byte INPUT_RPM = 3; //Interruptable PIN on Nano
 #define STEPPIN_2 5 //back view bottom right pin
 #define STEPPIN_3 6 //back view bottom left pin
 #define STEPPIN_4 7 //back view top left pin
-const byte INPUT_BUTTON = 8; //brake light test button
-#define SERIAL_RX 9 // D9 lambda digital serial input
-#define SERIAL_TX 10 // D10 lambda digital serial input
+#define SERIAL_RX 8 // D8 lambda digital serial input
+#define SERIAL_TX 9 // D9 lambda digital serial input
+const byte INPUT_BUTTON = 10; //brake light test button
 const byte INPUT_POWER = 11; //Power sense pin
 const byte OUTPUT_POWER = 12; //Power off pin
 const byte OUTPUT_WARN = 13; //D13 warn light out

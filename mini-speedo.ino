@@ -19,6 +19,8 @@
 #include "SwitecX25.h"
 #include <EEPROMex.h>
 #include <avr/wdt.h>
+#include <AltSoftSerial.h>
+
 //----End Libraries--------------
 
 //----Define PIN Settings----------
@@ -129,6 +131,10 @@ const char *displayNames[] = {
 #define EE_TRIP_POS 5
 //----End EERPOM positions----
 
+//----AltSerial----
+AltSoftSerial altSerial;
+//----End AltSerial----
+
 //-----Variables----------------------
 uint32_t total = 0; //total distance in decimeters
 uint32_t trip = 0; //trip distance in decimeters
@@ -162,6 +168,7 @@ unsigned long rpmLastEvent = 0;
 volatile unsigned long speedCount = 0;
 volatile unsigned long speedEvent = 0;
 unsigned long speedLastEvent = 0;
+
 //----End Variables-------------------
 
 //-----Start-up code run once---------
@@ -170,6 +177,7 @@ void setup(void) {
   wdt_disable(); // watchdog disable
 
   Serial.begin(115200);
+  altSerial.begin(115200);
 
   display.begin();
   display.setDrawColor(1);

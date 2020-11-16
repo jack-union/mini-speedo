@@ -20,7 +20,8 @@
 #include <EEPROMex.h>
 #include <avr/wdt.h>
 #include <AltSoftSerial.h>
-
+#include <OneWire.h>
+#include <DallasTemperature.h>
 //----End Libraries--------------
 
 //----Define PIN Settings----------
@@ -65,10 +66,6 @@ const byte INPUT_VOLTAGE = A7;
 //----Define OLED Display Settings----
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
-//1,3" SH1106 display
-//U8G2_SH1106_128X64_NONAME_1_HW_I2C display(U8G2_R0);
-//0,96" SSD1306 display
-U8G2_SSD1306_128X64_NONAME_1_HW_I2C display(U8G2_R0);
 //-----End OLED Display Settings------
 
 //----Define other constants-------
@@ -83,8 +80,6 @@ const int UPDATE_INTERVAL = 100;  // milliseconds speedo update rate
 #define STEPS 248*3
 // speedo type
 #define SPEEDO_RANGE 210 //cooper with 210kph full range
-// create the motor object with the maximum steps allowed
-SwitecX25 stepper(STEPS, STEPPIN_1, STEPPIN_2, STEPPIN_3, STEPPIN_4);
 #define SWEEP_AT_START 1
 //----End Stepper settings and object----
 
@@ -131,9 +126,22 @@ const char *displayNames[] = {
 #define EE_TRIP_POS 5
 //----End EERPOM positions----
 
-//----AltSerial----
+//----Objects----
+//1,3" SH1106 display
+//U8G2_SH1106_128X64_NONAME_1_HW_I2C display(U8G2_R0);
+//0,96" SSD1306 display
+U8G2_SSD1306_128X64_NONAME_1_HW_I2C display(U8G2_R0);
+
+// create the motor object with the maximum steps allowed
+SwitecX25 stepper(STEPS, STEPPIN_1, STEPPIN_2, STEPPIN_3, STEPPIN_4);
+
+// Serial input port
 AltSoftSerial altSerial;
-//----End AltSerial----
+
+// External temperature
+OneWire oneWire(INPUT_OUTSIDETEMP);
+DallasTemperature sensors(&oneWire);
+//----End Objects----
 
 //-----Variables----------------------
 uint32_t total = 0; //total distance in decimeters
@@ -178,6 +186,7 @@ void setup(void) {
 
   Serial.begin(115200);
   altSerial.begin(115200);
+  sensors.begin();
 
   display.begin();
   display.setDrawColor(1);

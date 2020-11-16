@@ -8,17 +8,21 @@ void gather_data() {
   uint16_t raw_oiltemp = analogRead(INPUT_OILTEMP);
   uint16_t raw_oilpress = analogRead(INPUT_OILPRESS);
   uint16_t raw_lambda = analogRead(INPUT_LAMBDA);
-  uint16_t raw_outsidetemp = analogRead(INPUT_OUTSIDETEMP);
   uint16_t raw_voltage = analogRead(INPUT_VOLTAGE);
 
   //Demo
   watertemp = 93;
   oiltemp = 108;
   oilpress = 450;
-  outsidetemp = 23;
+
 
   //do sensor data conversions
 
+  //digital 1-wire temperature sensor reading
+  sensors.requestTemperatures();
+  outsidetemp = round(sensors.getTempCByIndex(0));
+
+  //Lambda sensor reading
   if ( LAMBDA_DIGITAL ) {
     // Lambda digital
   } else {
@@ -28,7 +32,7 @@ void gather_data() {
     lambda = (raw_lambda * 60 / 1024) + 70;
   }
 
-  // Voltage
+  //Voltage reading
   // voltage divider 1:4 connected to Vbat, limited to 4,7V => max 18,8V
   // 1024 == 5V, 512 == 2.5V resp 10V Vbat resp voltage value 100.
   voltage = raw_voltage * 50 / 256;

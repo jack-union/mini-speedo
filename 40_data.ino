@@ -15,12 +15,7 @@ void gather_data() {
   watertemp = 93;
   oiltemp = 108;
   oilpress = 450;
-  //lambda = 97;
-  raw_lambda = 375; // 0.92
   outsidetemp = 23;
-  //voltage = 144;
-  //raw_voltage = 707; // 13.8V
-
 
   //do sensor data conversions
 

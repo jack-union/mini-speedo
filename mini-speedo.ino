@@ -21,7 +21,7 @@
 #include <avr/wdt.h>
 #include <AltSoftSerial.h>
 #include <OneWire.h>
-#include <DallasTemperature.h>
+#include <DS18B20_INT.h>
 //----End Libraries--------------
 
 //----Define PIN Settings----------
@@ -140,7 +140,7 @@ AltSoftSerial altSerial;
 
 // External temperature
 OneWire oneWire(INPUT_OUTSIDETEMP);
-DallasTemperature sensors(&oneWire);
+DS18B20_INT outsideSensor(&oneWire);
 //----End Objects----
 
 //-----Variables----------------------
@@ -186,7 +186,7 @@ void setup(void) {
 
   Serial.begin(115200);
   altSerial.begin(115200);
-  sensors.begin();
+  outsideSensor.begin();
 
   display.begin();
   display.setDrawColor(1);

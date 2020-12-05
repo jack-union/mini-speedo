@@ -20,9 +20,8 @@ void gather_data() {
 
   //digital 1-wire temperature sensor reading
   outsideSensor.requestTemperatures();
-  if (outsideSensor.isConversionComplete()) {
-    outsidetemp = outsideSensor.getTempC();
-  }
+  outsidetemp = outsideSensor.getTempCByIndex(0);
+
 
   //Lambda sensor reading
   if ( LAMBDA_DIGITAL ) {

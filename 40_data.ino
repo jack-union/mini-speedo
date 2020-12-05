@@ -38,6 +38,16 @@ void gather_data() {
   // 1024 == 5V, 512 == 2.5V resp 10V Vbat resp voltage value 100.
   voltage = raw_voltage * 50 / 256;
 
+  //Oil pressure, 5 bar VDO sensor 10-184 Ohm at 100 Ohm pullup.
+  // 93 => 0 bar, 665 => 5 bar
+  // raw > 802 => sensor not connected
+  if ( raw_oilpress > 802 ) {
+    oilpress = 3000;
+  } else if ( raw_oilpress < 94 ) {
+    oilpress = 0;
+  } else {
+    oilpress = (((22 * raw_oilpress - 2048) * 2) / (1024 - raw_oilpress)) * 7;
+  }
 }
 
 void check_warnings () {

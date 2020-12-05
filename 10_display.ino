@@ -189,7 +189,7 @@ void draw_oil_press(uint16_t readout) {
   display.setFont(LARGE_FONT);
   display.setCursor(15, 60);
 
-  if ( readout == 3000 ) {
+  if ( readout == NODATA ) {
     display.print("-.--");
   } else {
     sprintf(data, "%03d", readout);

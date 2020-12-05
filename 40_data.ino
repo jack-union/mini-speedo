@@ -42,7 +42,7 @@ void gather_data() {
   // 93 => 0 bar, 665 => 5 bar
   // raw > 802 => sensor not connected
   if ( raw_oilpress > 802 ) {
-    oilpress = 3000;
+    oilpress = NODATA;
   } else if ( raw_oilpress < 94 ) {
     oilpress = 0;
   } else {

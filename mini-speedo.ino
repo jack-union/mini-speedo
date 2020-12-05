@@ -156,6 +156,7 @@ uint16_t voltage = 0; //main voltage in volt *10
 uint16_t watertemp = 0; //temperature in °C
 uint16_t outsidetemp = 0; //temperature in °C
 uint16_t rpm = 0; //revolutions per minute
+#define NODATA 65535 //max uint16 when no data
 
 bool warningOiltemp = false;
 bool warningOilpress = true; // probably no oil pressure at startup

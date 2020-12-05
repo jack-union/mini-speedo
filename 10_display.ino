@@ -186,14 +186,19 @@ void draw_oil_temp(uint16_t readout) {
 
 void draw_oil_press(uint16_t readout) {
   char data[4] = "";
-  sprintf(data, "%03d", readout);
-
   display.setFont(LARGE_FONT);
   display.setCursor(15, 60);
-  display.print(data[0]);
-  display.print(".");
-  display.print(data[1]);
-  display.print(data[2]);
+
+  if ( readout == 3000 ) {
+    display.print("-.--");
+  } else {
+    sprintf(data, "%03d", readout);
+
+    display.print(data[0]);
+    display.print(".");
+    display.print(data[1]);
+    display.print(data[2]);
+  }
 
   display.setFont(SMALL_FONT);
   display.setCursor(85, 60);

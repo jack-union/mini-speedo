@@ -13,7 +13,7 @@ void gather_data() {
   //Demo
   watertemp = 93;
   oiltemp = 108;
-  oilpress = 450;
+  raw_oilpress = 450;
 
 
   //do sensor data conversions

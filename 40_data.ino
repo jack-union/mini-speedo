@@ -4,11 +4,31 @@
 */
 
 void gather_data() {
-  uint16_t raw_watertemp = analogRead(INPUT_WATERTEMP);
-  uint16_t raw_oiltemp = analogRead(INPUT_OILTEMP);
-  uint16_t raw_oilpress = analogRead(INPUT_OILPRESS);
-  uint16_t raw_lambda = analogRead(INPUT_LAMBDA);
-  uint16_t raw_voltage = analogRead(INPUT_VOLTAGE);
+  uint16_t samples[ANALOGSAMPLES];
+  uint16_t raw_watertemp = 0;
+  uint16_t raw_oiltemp = 0;
+  uint16_t raw_oilpress = 0;
+  uint16_t raw_lambda = 0;
+  uint16_t raw_voltage = 0;
+  uint8_t runs;
+
+  // do multiple samples
+  for ( runs = 0 ; runs < ANALOGSAMPLES ; runs++ ) {
+    raw_watertemp += analogRead(INPUT_WATERTEMP);
+    raw_oiltemp += analogRead(INPUT_OILTEMP);
+    raw_oilpress += analogRead(INPUT_OILPRESS);
+    raw_lambda += analogRead(INPUT_LAMBDA);
+    raw_voltage += analogRead(INPUT_VOLTAGE);
+    delay(5);
+  }
+
+  // and even them out
+  raw_watertemp = raw_watertemp / ANALOGSAMPLES;
+  raw_oiltemp = raw_oiltemp / ANALOGSAMPLES;
+  raw_oilpress = raw_oilpress / ANALOGSAMPLES;
+  raw_lambda = raw_lambda / ANALOGSAMPLES;
+  raw_voltage = raw_voltage / ANALOGSAMPLES;
+
 
   //Demo
   watertemp = 93;

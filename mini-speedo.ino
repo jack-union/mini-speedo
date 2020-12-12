@@ -62,7 +62,6 @@ const byte INPUT_VOLTAGE = A7;
 #define WARN_MAX_VOLTAGE 154 // 15.4 Volts
 #define WARN_MAX_WATERTEMP 100 // 100° Celsius
 #define WARN_MIN_OUTSIDETEMP 2 // 2° Celsius
-
 //----End Define warning limits----
 
 //----Define OLED Display Settings----
@@ -76,6 +75,16 @@ const int IMP_PER_KM = 800;  // "Wegstrecke", impulses per 1000m
 const byte RPM_IMP_PER_REV = 2; // SPI/Distributor, set to 1 for MPI
 const int UPDATE_INTERVAL = 100;  // milliseconds speedo update rate
 //----End Define other constants---
+
+//----Define sensor constants-------
+#define ANALOGSAMPLES 5
+#define MINITEMP_T0 303  // 303 Kelvin = 30° Celsius
+#define MINITEMP_R0 833  // 833 Ohm at 303 Kelvin
+#define RACIMEXTEMP_T0 318  // 318 Kelvin = 45° Celsius
+#define RACIMEXTEMP_R0 1240 // 1240 Ohm at 318 Kelvin
+#define OILTEMP_PULLUP 470  // 470 Ohm to 5V
+#define OILPRESS_PULLUP 100 // 100 Ohm to 5V
+//----End Define sensor constants---
 
 //----Stepper settings and object----
 // standard X25.168 range 315 degrees at 1/3 degree steps

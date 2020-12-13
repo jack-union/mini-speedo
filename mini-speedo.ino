@@ -233,6 +233,9 @@ void setup(void) {
 }
 //------End Start-up code-------------
 
+unsigned long no = 0;
+unsigned long yes = 0;
+
 //------Start of Loop-----------------
 void loop() {
   //check button status
@@ -245,6 +248,15 @@ void loop() {
     do_display();
     do_stepper();
     displayUpdatedAt = millis();
+    yes += 1;
+  } else {
+    no += 1;
+  }
+  if ( yes == 10 ) {
+    Serial.print("No: ");
+    Serial.println(no);
+    yes = 0;
+    no = 0;
   }
   //move stepper towards target position
   stepper.update();

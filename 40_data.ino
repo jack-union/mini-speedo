@@ -29,17 +29,13 @@ void gather_data() {
   raw_lambda = raw_lambda / ANALOGSAMPLES;
   raw_voltage = raw_voltage / ANALOGSAMPLES;
 
-
-  //Demo
-  watertemp = 93;
-  oiltemp = 108;
-
   //do sensor data conversions
 
+  //Outside temperature
   //digital 1-wire temperature sensor reading
   //outsideSensor.requestTemperatures();
   //outsidetemp = outsideSensor.getTempCByIndex(0);
-
+  // really 1-wire?
 
   //Lambda sensor reading
   if ( LAMBDA_DIGITAL ) {
@@ -66,11 +62,54 @@ void gather_data() {
   } else {
     oilpress = (((22 * raw_oilpress - 2048) * 2) / (1024 - raw_oilpress)) * 7;
   }
+
+  //Oil temperature, Racimex temp sensor at 470 Ohm pullup
+  // 100 => temp too high, > 802 => temp too low
+  if ( raw_oiltemp > 802 ) {
+    oiltemp = NODATA;
+  } else if ( raw_oiltemp < 100 ) {
+    oiltemp = TEMPTOOHIGH;
+  } else {
+    oiltemp = beta(raw_oiltemp, RACIMEXTEMP_T0, RACIMEXTEMP_R0, RACIMEXTEMP_B, OILTEMP_PULLUP);
+  }
+
+  //Water temperature, Mini GTR101 temp sensor, connected to instrument as pullup to 10V
+  // 300 => temp too high, > 950 => temp too low
+  if ( raw_watertemp > 950 ) {
+    watertemp = NODATA;
+  } else if ( raw_watertemp < 300 ) {
+    watertemp = TEMPTOOHIGH;
+  } else {
+    watertemp = beta(raw_watertemp, MINITEMP_T0, MINITEMP_R0, MINITEMP_B, WATERTEMP_PULLUP);
+  }
+
+}
+
+// beta equation - simplified from Steinhart–Hart equation
+// https://en.wikipedia.org/wiki/Thermistor
+uint16_t beta (uint16_t reading, float T0, float R0, float B, float pullup) {
+
+  float r; //resistance
+  float v; //temperature value
+
+  r = pullup / ((1024 / (float)reading) - 1 );
+
+  v = ((log(r / R0)) / B) + ( 1 / T0);
+  v = 1.0 / v;             // Invert v
+  v = v - 273.15;          // convert to celsius
+
+  if ( v >= 0 ) {
+    return int(v);
+  } else {
+    return 0;
+  }
 }
 
 void check_warnings () {
   byte switchDisplayTo = 255;
   bool setWarningOutput = false;
+
+  // what about nodata and temptoohigh?
 
   if ( outsidetemp < WARN_MIN_OUTSIDETEMP ) {
     if ( !warningOutsidetemp ) { // new warning
@@ -92,24 +131,29 @@ void check_warnings () {
     warningVoltage = false; // reset warning
   }
 
-  if ( oiltemp > WARN_MAX_OILTEMP ) {
-    setWarningOutput = true;
-    if ( !warningOiltemp ) { // new warning
-      switchDisplayTo = OIL_TEMP;
-      warningOiltemp = true;
+  if ( oiltemp != NODATA ) {
+    if ( oiltemp > WARN_MAX_OILTEMP ) {
+      setWarningOutput = true;
+      if ( !warningOiltemp ) { // new warning
+        switchDisplayTo = OIL_TEMP;
+        warningOiltemp = true;
+      }
     }
-  } else {
-    warningOiltemp = false; // reset warning
+    else {
+      warningOiltemp = false; // reset warning
+    }
   }
 
-  if ( watertemp > WARN_MAX_WATERTEMP ) {
-    setWarningOutput = true;
-    if ( !warningWatertemp ) { // new warning
-      switchDisplayTo = WATER_TEMP;
-      warningWatertemp = true;
+  if ( watertemp != NODATA ) {
+    if ( watertemp > WARN_MAX_WATERTEMP ) {
+      setWarningOutput = true;
+      if ( !warningWatertemp ) { // new warning
+        switchDisplayTo = WATER_TEMP;
+        warningWatertemp = true;
+      }
+    } else {
+      warningWatertemp = false; // reset warning
     }
-  } else {
-    warningWatertemp = false; // reset warning
   }
 
   if ( oilpress < WARN_MIN_OILPRESS ) {

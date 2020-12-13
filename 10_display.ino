@@ -172,7 +172,14 @@ void draw_oil_temp(uint16_t readout) {
 
   display.setFont(LARGE_FONT);
   display.setCursor(15, 60);
-  display.println(data);
+
+  if ( readout == NODATA ) {
+    display.println(F("---"));
+  } else if ( readout == TEMPTOOHIGH ) {
+    display.println(F("HIGH"));
+  } else {
+    display.println(data);
+  }
 
   display.setFont(SMALL_FONT);
   display.setCursor(85, 60);
@@ -235,14 +242,21 @@ void draw_water_temp(uint16_t readout) {
 
   display.setFont(LARGE_FONT);
   display.setCursor(15, 60);
-  display.println(data);
+
+  if ( readout == NODATA ) {
+    display.println(F("---"));
+  } else if ( readout == TEMPTOOHIGH ) {
+    display.println(F("HIGH"));
+  } else {
+    display.println(data);
+  }
 
   display.setFont(SMALL_FONT);
   display.setCursor(85, 60);
   display.println(char(0xb0)); //ASCII "degrees" symbol
   display.println("C");
 
-  if ( warningVoltage ) {
+  if ( warningWatertemp ) {
     draw_warning();
   }
 }

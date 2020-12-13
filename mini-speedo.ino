@@ -87,6 +87,8 @@ const int UPDATE_INTERVAL = 100;  // milliseconds speedo update rate
 #define OILTEMP_PULLUP 470  // 470 Ohm to 5V
 #define WATERTEMP_PULLUP 61 // Resistance of water temp instrument
 #define OILPRESS_PULLUP 100 // 100 Ohm to 5V
+#define NODATA 65535 //max uint16 when no data
+#define TEMPTOOHIGH 65534 //max uint16 -1 when reading too high
 //----End Define sensor constants---
 
 //----Stepper settings and object----
@@ -104,8 +106,8 @@ const int UPDATE_INTERVAL = 100;  // milliseconds speedo update rate
 #define LAMBDA 3
 #define OIL_TEMP 4
 #define OIL_PRESS 5
-#define VOLT 6
-#define WATER_TEMP 7
+#define WATER_TEMP 6
+#define VOLT 7
 #define OUTSIDE 8
 #define RPM 9
 #define MINI 10
@@ -121,8 +123,8 @@ const char *displayNames[] = {
   "lambda",
   "oil temp",
   "oil press",
-  "volt",
   "water",
+  "volt",
   "outside",
   "rpm",
   "" //no text in logo mode
@@ -168,7 +170,6 @@ uint16_t voltage = 0; //main voltage in volt *10
 uint16_t watertemp = 0; //temperature in °C
 uint16_t outsidetemp = 0; //temperature in °C
 uint16_t rpm = 0; //revolutions per minute
-#define NODATA 65535 //max uint16 when no data
 
 bool warningOiltemp = false;
 bool warningOilpress = true; // probably no oil pressure at startup

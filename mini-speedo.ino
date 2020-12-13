@@ -80,9 +80,12 @@ const int UPDATE_INTERVAL = 100;  // milliseconds speedo update rate
 #define ANALOGSAMPLES 5
 #define MINITEMP_T0 303  // 303 Kelvin = 30° Celsius
 #define MINITEMP_R0 833  // 833 Ohm at 303 Kelvin
+#define MINITEMP_B 3540  // beta constant for Steinhart Hart
 #define RACIMEXTEMP_T0 318  // 318 Kelvin = 45° Celsius
 #define RACIMEXTEMP_R0 1240 // 1240 Ohm at 318 Kelvin
+#define RACIMEXTEMP_B 3850  // beta constant for Steinhart Hart
 #define OILTEMP_PULLUP 470  // 470 Ohm to 5V
+#define WATERTEMP_PULLUP 61 // Resistance of water temp instrument
 #define OILPRESS_PULLUP 100 // 100 Ohm to 5V
 //----End Define sensor constants---
 

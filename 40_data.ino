@@ -39,8 +39,8 @@ void gather_data() {
   //do sensor data conversions
 
   //digital 1-wire temperature sensor reading
-  outsideSensor.requestTemperatures();
-  outsidetemp = outsideSensor.getTempCByIndex(0);
+  //outsideSensor.requestTemperatures();
+  //outsidetemp = outsideSensor.getTempCByIndex(0);
 
 
   //Lambda sensor reading

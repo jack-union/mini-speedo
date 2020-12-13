@@ -153,8 +153,8 @@ SwitecX25 stepper(STEPS, STEPPIN_1, STEPPIN_2, STEPPIN_3, STEPPIN_4);
 AltSoftSerial altSerial;
 
 // External temperature
-OneWire oneWire(INPUT_OUTSIDETEMP);
-DallasTemperature outsideSensor(&oneWire);
+//OneWire oneWire(INPUT_OUTSIDETEMP);
+//DallasTemperature outsideSensor(&oneWire);
 //----End Objects----
 
 //-----Variables----------------------
@@ -201,7 +201,7 @@ void setup(void) {
 
   Serial.begin(115200);
   altSerial.begin(115200);
-  outsideSensor.begin();
+  //outsideSensor.begin();
 
   display.begin();
   display.setDrawColor(1);

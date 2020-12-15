@@ -20,7 +20,7 @@
 #include "SwitecX25.h"
 #include <EEPROMex.h>
 #include <avr/wdt.h>
-#include <AltSoftSerial.h>
+//#include <AltSoftSerial.h>
 #include <OneWire.h>
 #define REQUIRESNEW false
 #define REQUIRESALARMS false
@@ -41,13 +41,13 @@
 #define OUTPUT_POWER 12 //Power off pin
 #define OUTPUT_WARN 13 //D13 warn light out
 
-#define INPUT_WATERTEMP A0
+#define INPUT_OUTSIDETEMP A0
 #define INPUT_OILTEMP A1
 #define INPUT_OILPRESS A2
 #define INPUT_LAMBDA A3
 //A4: SDA
 //A5: SCL
-#define INPUT_OUTSIDETEMP A6
+#define INPUT_WATERTEMP A6
 #define INPUT_VOLTAGE A7
 //----End Define PIN Settings------
 
@@ -153,11 +153,11 @@ U8G2_SSD1306_128X64_NONAME_1_HW_I2C display(U8G2_R0);
 SwitecX25 stepper(STEPS, STEPPIN_1, STEPPIN_2, STEPPIN_3, STEPPIN_4);
 
 // Serial input port
-AltSoftSerial altSerial;
+//AltSoftSerial altSerial;
 
 // External temperature
-//OneWire oneWire(INPUT_OUTSIDETEMP);
-//DallasTemperature outsideSensor(&oneWire);
+OneWire oneWire(INPUT_OUTSIDETEMP);
+DallasTemperature outsideSensor(&oneWire);
 //----End Objects----
 
 //-----Variables----------------------
@@ -202,9 +202,9 @@ void setup(void) {
   wdt_disable(); // watchdog disable
 
   Serial.begin(115200);
-  altSerial.begin(115200);
-  //outsideSensor.begin();
-  //outsideSensor.setResolution(9);
+  //altSerial.begin(115200);
+  outsideSensor.begin();
+  outsideSensor.setResolution(9);
 
   display.begin();
   display.setDrawColor(1);
@@ -236,9 +236,6 @@ void setup(void) {
 }
 //------End Start-up code-------------
 
-unsigned long no = 0;
-unsigned long yes = 0;
-
 //------Start of Loop-----------------
 void loop() {
   //check button status
@@ -251,15 +248,6 @@ void loop() {
     do_display();
     do_stepper();
     displayUpdatedAt = millis();
-    yes += 1;
-  } else {
-    no += 1;
-  }
-  if ( yes == 10 ) {
-    Serial.print("No: ");
-    Serial.println(no);
-    yes = 0;
-    no = 0;
   }
   //move stepper towards target position
   stepper.update();

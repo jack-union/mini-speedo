@@ -71,10 +71,11 @@
 //-----End OLED Display Settings------
 
 //----Define other constants-------
-const byte SPEED_IMP_PER_REV = 6;
-const int IMP_PER_KM = 800;  // "Wegstrecke", impulses per 1000m
-const byte RPM_IMP_PER_REV = 2; // SPI/Distributor, set to 1 for MPI
-const int UPDATE_INTERVAL = 100;  // milliseconds speedo update rate
+#define SPEED_IMP_PER_REV 6  // impulses per revolution
+#define IMP_PER_KM 800    // "Wegstrecke", impulses per 1000m
+#define RPM_IMP_PER_REV 2 // SPI/Distributor, set to 1 for MPI
+#define UPDATE_INTERVAL 100  // milliseconds speedo update rate
+#define TEMP_EVERY_LOOPS 10  // every 10 loops update Dallas temperature sensor
 //----End Define other constants---
 
 //----Define sensor constants-------
@@ -158,6 +159,7 @@ SwitecX25 stepper(STEPS, STEPPIN_1, STEPPIN_2, STEPPIN_3, STEPPIN_4);
 // External temperature
 OneWire oneWire(INPUT_OUTSIDETEMP);
 DallasTemperature outsideSensor(&oneWire);
+DeviceAddress dallasDeviceAddress;
 //----End Objects----
 
 //-----Variables----------------------
@@ -169,14 +171,14 @@ uint16_t oiltemp = 0; //temperature in °C
 uint16_t oilpress = 0; //oil pressure in bar *100
 uint16_t voltage = 0; //main voltage in volt *10
 uint16_t watertemp = 0; //temperature in °C
-uint16_t outsidetemp = 0; //temperature in °C
+uint16_t outsidetemp = 0; //temperature in °C *10
 uint16_t rpm = 0; //revolutions per minute
 
 bool warningOiltemp = false;
 bool warningOilpress = true; // probably no oil pressure at startup
 bool warningVoltage = false;
 bool warningWatertemp = false;
-bool warningOutsidetemp = false;
+bool warningOutsidetemp = true; // no real startvalue for TEMP_EVERY_LOOPS
 
 #define ROLLOVER 1000000000 //100000km in decimeter
 byte displayMode = ODO; // Startup setting
@@ -185,6 +187,7 @@ bool buttonBeforeState = HIGH;
 unsigned long timePressed = 0;
 unsigned long displayUpdatedAt = 0;
 bool displayChanged = false;
+byte loops = 0;
 
 #define ZEROTIME 1000 //no new interrupt pulses for max ms
 volatile unsigned long rpmCount = 0;
@@ -204,7 +207,10 @@ void setup(void) {
   Serial.begin(115200);
   //altSerial.begin(115200);
   outsideSensor.begin();
-  outsideSensor.setResolution(9);
+  outsideSensor.getAddress(dallasDeviceAddress, 0);
+  outsideSensor.setResolution(dallasDeviceAddress, 9); //less resolution, faster reading
+  outsideSensor.setWaitForConversion(false); //async reading
+  outsideSensor.requestTemperatures(); //start first request
 
   display.begin();
   display.setDrawColor(1);
@@ -240,6 +246,7 @@ void setup(void) {
 void loop() {
   //check button status
   do_button();
+
   //display and data refresh every (UPDATE_INTERVAL) milliseconds
   if ( (millis() - displayUpdatedAt) > UPDATE_INTERVAL ) {
     gather_data();
@@ -248,9 +255,19 @@ void loop() {
     do_display();
     do_stepper();
     displayUpdatedAt = millis();
+    loops = loops + 1;
   }
+
+  //refresh data from Dallas sensor less often
+  if ( loops == TEMP_EVERY_LOOPS ) {
+    outsidetemp = int(outsideSensor.getTempCByIndex(0) * 10);
+    outsideSensor.requestTemperatures(); //request value for next run
+    loops = 0;
+  }
+
   //move stepper towards target position
   stepper.update();
+
   //switch power supply off and save to eeprom
   //when power goes down
   sense_power_off();

@@ -33,9 +33,7 @@ void gather_data() {
 
   //Outside temperature
   //digital 1-wire temperature sensor reading
-  //outsideSensor.requestTemperatures();
-  //outsidetemp = outsideSensor.getTempCByIndex(0);
-  // really 1-wire?
+  //see main loop
 
   //Lambda sensor reading
   if ( LAMBDA_DIGITAL ) {

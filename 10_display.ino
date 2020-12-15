@@ -262,12 +262,16 @@ void draw_water_temp(uint16_t readout) {
 }
 
 void draw_outside_temp(int16_t readout) {
-  char data[4] = "";
-  sprintf(data, "% 3d", readout);
+  char data[5] = "";
+  sprintf(data, "% 4d", readout);
 
   display.setFont(LARGE_FONT);
-  display.setCursor(15, 60);
-  display.println(data);
+  display.setCursor(10, 60);
+  display.print(data[0]);
+  display.print(data[1]);
+  display.print(data[2]);
+  display.print(".");
+  display.print(data[3]);
 
   display.setFont(SMALL_FONT);
   display.setCursor(85, 60);

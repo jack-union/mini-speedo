@@ -14,6 +14,7 @@
 */
 
 //----Libraries to Include--------
+#include <Arduino.h>
 #include <Wire.h>
 #include <U8g2lib.h>
 #include "SwitecX25.h"
@@ -203,6 +204,7 @@ void setup(void) {
   Serial.begin(115200);
   altSerial.begin(115200);
   //outsideSensor.begin();
+  //outsideSensor.setResolution(9);
 
   display.begin();
   display.setDrawColor(1);

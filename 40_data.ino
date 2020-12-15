@@ -109,8 +109,6 @@ void check_warnings () {
   byte switchDisplayTo = 255;
   bool setWarningOutput = false;
 
-  // what about nodata and temptoohigh?
-
   if ( outsidetemp < WARN_MIN_OUTSIDETEMP ) {
     if ( !warningOutsidetemp ) { // new warning
       switchDisplayTo = OUTSIDE;

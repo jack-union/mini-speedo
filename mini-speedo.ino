@@ -28,27 +28,27 @@
 //----End Libraries--------------
 
 //----Define PIN Settings----------
-const byte INPUT_SPEED = 2; //Interruptable PIN on Nano
-const byte INPUT_RPM = 3; //Interruptable PIN on Nano
+#define INPUT_SPEED 2 //Interruptable PIN on Nano
+#define INPUT_RPM 3 //Interruptable PIN on Nano
 #define STEPPIN_1 4 //back view top right pin
 #define STEPPIN_2 5 //back view bottom right pin
 #define STEPPIN_3 6 //back view bottom left pin
 #define STEPPIN_4 7 //back view top left pin
 #define SERIAL_RX 8 // D8 lambda digital serial input
 #define SERIAL_TX 9 // D9 lambda digital serial input
-const byte INPUT_BUTTON = 10; //brake light test button
-const byte INPUT_POWER = 11; //Power sense pin
-const byte OUTPUT_POWER = 12; //Power off pin
-const byte OUTPUT_WARN = 13; //D13 warn light out
+#define INPUT_BUTTON 10 //brake light test button
+#define INPUT_POWER 11 //Power sense pin
+#define OUTPUT_POWER 12 //Power off pin
+#define OUTPUT_WARN 13 //D13 warn light out
 
-const byte INPUT_WATERTEMP = A0;
-const byte INPUT_OILTEMP = A1;
-const byte INPUT_OILPRESS = A2;
-const byte INPUT_LAMBDA = A3;
+#define INPUT_WATERTEMP A0
+#define INPUT_OILTEMP A1
+#define INPUT_OILPRESS A2
+#define INPUT_LAMBDA A3
 //A4: SDA
 //A5: SCL
-const byte INPUT_OUTSIDETEMP = A6;
-const byte INPUT_VOLTAGE = A7;
+#define INPUT_OUTSIDETEMP A6
+#define INPUT_VOLTAGE A7
 //----End Define PIN Settings------
 
 //----Define Lambda sensor input----

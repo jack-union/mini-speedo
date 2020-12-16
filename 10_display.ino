@@ -3,7 +3,7 @@
 
 */
 #define SMALL_FONT u8g2_font_logisoso18_tf
-#define LARGE_FONT u8g2_font_logisoso24_tf
+#define LARGE_FONT u8g2_font_logisoso24_tn
 
 void do_display() {
   if (displayMode != MINI) {
@@ -176,7 +176,7 @@ void draw_oil_temp(uint16_t readout) {
   if ( readout == NODATA ) {
     display.println(F("---"));
   } else if ( readout == TEMPTOOHIGH ) {
-    display.println(F("HIGH"));
+    display.println(F("+++"));
   } else {
     display.println(data);
   }
@@ -246,7 +246,7 @@ void draw_water_temp(uint16_t readout) {
   if ( readout == NODATA ) {
     display.println(F("---"));
   } else if ( readout == TEMPTOOHIGH ) {
-    display.println(F("HIGH"));
+    display.println(F("+++"));
   } else {
     display.println(data);
   }

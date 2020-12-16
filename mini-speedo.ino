@@ -146,9 +146,9 @@ const char *displayNames[] = {
 
 //----Objects----
 //1,3" SH1106 display
-//U8G2_SH1106_128X64_NONAME_1_HW_I2C display(U8G2_R0);
+//U8G2_SH1106_128X64_NONAME_2_HW_I2C display(U8G2_R0);
 //0,96" SSD1306 display
-U8G2_SSD1306_128X64_NONAME_1_HW_I2C display(U8G2_R0);
+U8G2_SSD1306_128X64_NONAME_2_HW_I2C display(U8G2_R0);
 
 // create the motor object with the maximum steps allowed
 SwitecX25 stepper(STEPS, STEPPIN_1, STEPPIN_2, STEPPIN_3, STEPPIN_4);

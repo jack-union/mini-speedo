@@ -45,6 +45,13 @@ void gather_data() {
     lambda = (raw_lambda * 60 / 1024) + 70;
   }
 
+  //Testloop for serial input
+  char c;
+  while (altSerial.available()) {
+    c = altSerial.read();
+    Serial.print(c);
+  }
+
   //Voltage reading
   // voltage divider 1:4 connected to Vbat, limited to 4,7V => max 18,8V
   // 1024 == 5V, 512 == 2.5V resp 10V Vbat resp voltage value 100.

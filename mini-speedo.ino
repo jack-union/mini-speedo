@@ -20,7 +20,7 @@
 #include "SwitecX25.h"
 #include <EEPROMex.h>
 #include <avr/wdt.h>
-//#include <AltSoftSerial.h>
+#include <AltSoftSerial.h>
 #include <OneWire.h>
 #define REQUIRESNEW false
 #define REQUIRESALARMS false
@@ -154,7 +154,7 @@ U8G2_SSD1306_128X64_NONAME_2_HW_I2C display(U8G2_R0);
 SwitecX25 stepper(STEPS, STEPPIN_1, STEPPIN_2, STEPPIN_3, STEPPIN_4);
 
 // Serial input port
-//AltSoftSerial altSerial;
+AltSoftSerial altSerial;
 
 // External temperature
 OneWire oneWire(INPUT_OUTSIDETEMP);
@@ -205,7 +205,7 @@ void setup(void) {
   wdt_disable(); // watchdog disable
 
   Serial.begin(115200);
-  //altSerial.begin(115200);
+  altSerial.begin(115200);
   outsideSensor.begin();
   outsideSensor.getAddress(dallasDeviceAddress, 0);
   outsideSensor.setResolution(dallasDeviceAddress, 9); //less resolution, faster reading

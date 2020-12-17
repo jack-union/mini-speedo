@@ -54,6 +54,13 @@ void do_display() {
         break;
     }
   } while ( display.nextPage() );
+
+/*
+  totalDisplay.firstPage();
+  do {
+
+  } while ( totalDisplay.nextPage() );
+*/
 }
 
 void increment_display () {

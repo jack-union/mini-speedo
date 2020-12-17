@@ -16,6 +16,10 @@
 //----Libraries to Include--------
 #include <Arduino.h>
 #include <Wire.h>
+//edited in clib/u8g2.h
+//#define U8G2_WITH_CLIP_WINDOW_SUPPORT
+//#define U8G2_WITH_FONT_ROTATION
+//#define U8G2_WITH_UNICODE
 #include <U8g2lib.h>
 #include "SwitecX25.h"
 #include <EEPROMex.h>

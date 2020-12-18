@@ -13,6 +13,8 @@
 
 */
 
+#define MINI_SPEEDO_VERSION "Speedo v0.7"
+
 //----Libraries to Include--------
 #include <Arduino.h>
 #include <Wire.h>
@@ -106,24 +108,22 @@
 //----End Stepper settings and object----
 
 //----Display modes----
-#define ODO 0
-#define TRIP 1
-#define SPEED 2
-#define LAMBDA 3
-#define OIL_TEMP 4
-#define OIL_PRESS 5
-#define WATER_TEMP 6
-#define VOLT 7
-#define OUTSIDE 8
-#define RPM 9
-#define MINI 10
+#define TRIP 0
+#define SPEED 1
+#define LAMBDA 2
+#define OIL_TEMP 3
+#define OIL_PRESS 4
+#define WATER_TEMP 5
+#define VOLT 6
+#define OUTSIDE 7
+#define RPM 8
+#define MINI 9
 
-#define MODEMAX 10
+#define MODEMAX 9
 //----End Display modes----
 
 //----Display mode names----
 const unsigned char *displayNames[] = {
-  "total",
   "trip",
   "speed",
   "lambda",
@@ -137,9 +137,9 @@ const unsigned char *displayNames[] = {
 };
 //----End Display mode names----
 
-//----Define Display positions----
+//----Define Display settings----
 #define X_OFFSET 10
-//----End Define Display positions----
+//----End Define Display settings----
 
 //----EERPOM positions----
 #define EE_TOKEN_POS 0
@@ -152,10 +152,10 @@ const unsigned char *displayNames[] = {
 //1,3" SH1106 display
 //U8G2_SH1106_128X64_NONAME_2_HW_I2C display(U8G2_R0);
 //0,96" SSD1306 display
-U8G2_SSD1306_128X64_NONAME_2_HW_I2C display(U8G2_R0);
+U8G2_SSD1306_128X64_NONAME_2_HW_I2C bigDisplay(U8G2_R0);
 //0,91" SSD1306 additional small display
 //U8G2_SSD1306_128X32_UNIVISION_2_HW_I2C totalDisplay(U8G2_R0); //different one needs more RAM
-U8G2_SSD1306_128X64_NONAME_2_HW_I2C totalDisplay(U8G2_R0);
+U8G2_SSD1306_128X64_NONAME_2_HW_I2C smallDisplay(U8G2_R0);
 
 // create the motor object with the maximum steps allowed
 SwitecX25 stepper(STEPS, STEPPIN_1, STEPPIN_2, STEPPIN_3, STEPPIN_4);
@@ -188,7 +188,7 @@ bool warningWatertemp = false;
 bool warningOutsidetemp = true; // no real startvalue for TEMP_EVERY_LOOPS
 
 #define ROLLOVER 1000000000 //100000km in decimeter
-byte displayMode = ODO; // Startup setting
+byte displayMode = TRIP; // Startup setting
 bool buttonState = HIGH;
 bool buttonBeforeState = HIGH;
 unsigned long timePressed = 0;
@@ -213,10 +213,8 @@ void setup(void) {
 
   Serial.begin(115200);
   altSerial.begin(115200);
+  Serial.println(F(MINI_SPEEDO_VERSION));
 
-  initOutsideSensor();
-  initDisplays();
-  
   pinMode(INPUT_SPEED, INPUT_PULLUP);
   pinMode(INPUT_RPM, INPUT_PULLUP);
   pinMode(INPUT_BUTTON, INPUT_PULLUP);
@@ -226,11 +224,9 @@ void setup(void) {
   pinMode(OUTPUT_WARN, OUTPUT);
   digitalWrite(OUTPUT_WARN, LOW); //warning off
 
-  display.firstPage();
-  do {
-    draw_logo();
-  } while ( display.nextPage() );
-  delay(1500);
+  initOutsideSensor();
+  initDisplays();
+  delay(1000);
   reset_stepper();
 
   EEPROM.setMemPool(0, EEPROMSizeNano); //set memory size
@@ -253,6 +249,7 @@ void loop() {
     gather_data();
     update_speed();
     update_rpm();
+    check_warnings();
     do_display();
     do_stepper();
     displayUpdatedAt = millis();
@@ -312,17 +309,6 @@ void do_button() {
   }
 }
 
-void initDisplays() {
-  //display.setI2CAddress(0x78); //0x3c * 2, default
-  display.begin();
-  display.setDrawColor(1);
-  display.setFontMode(0);
-  totalDisplay.setI2CAddress(0x7a); //0x3d * 2
-  totalDisplay.begin();
-  totalDisplay.setDrawColor(1);
-  totalDisplay.setFontMode(0);
-}
-
 void initOutsideSensor() {
   outsideSensor.begin();
   outsideSensor.getAddress(dallasDeviceAddress, 0);
@@ -336,10 +322,10 @@ void sense_power_off() {
     save_to_eeprom();
     stepper.setPosition(0);
     stepper.updateBlocking();
-    display.firstPage();
+    bigDisplay.firstPage();
     do {
       draw_goodbye();
-    } while ( display.nextPage() );
+    } while ( bigDisplay.nextPage() );
     delay(2000);
     digitalWrite(OUTPUT_POWER, HIGH);
     stop();

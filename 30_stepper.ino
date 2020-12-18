@@ -11,7 +11,6 @@ void reset_stepper() {
     delay (500);
     stepper.setPosition(0);
     stepper.updateBlocking();
-    delay (500);
   }
 }
 

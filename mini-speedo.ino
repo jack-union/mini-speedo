@@ -213,21 +213,10 @@ void setup(void) {
 
   Serial.begin(115200);
   altSerial.begin(115200);
-  outsideSensor.begin();
-  outsideSensor.getAddress(dallasDeviceAddress, 0);
-  outsideSensor.setResolution(dallasDeviceAddress, 9); //less resolution, faster reading
-  outsideSensor.setWaitForConversion(false); //async reading
-  outsideSensor.requestTemperatures(); //start first request
 
-  //display.setI2CAddress(0x78); //0x3c * 2, default
-  display.begin();
-  display.setDrawColor(1);
-  display.setFontMode(0);
-  totalDisplay.setI2CAddress(0x7a); //0x3d * 2
-  totalDisplay.begin();
-  totalDisplay.setDrawColor(1);
-  totalDisplay.setFontMode(0);
-
+  initOutsideSensor();
+  initDisplays();
+  
   pinMode(INPUT_SPEED, INPUT_PULLUP);
   pinMode(INPUT_RPM, INPUT_PULLUP);
   pinMode(INPUT_BUTTON, INPUT_PULLUP);
@@ -244,11 +233,11 @@ void setup(void) {
   delay(1500);
   reset_stepper();
 
-  attachInterrupt(digitalPinToInterrupt(INPUT_SPEED), interrupt_speed, RISING);
-  attachInterrupt(digitalPinToInterrupt(INPUT_RPM), interrupt_rpm, RISING);
-
   EEPROM.setMemPool(0, EEPROMSizeNano); //set memory size
   load_from_eeprom();
+
+  attachInterrupt(digitalPinToInterrupt(INPUT_SPEED), interrupt_speed, RISING);
+  attachInterrupt(digitalPinToInterrupt(INPUT_RPM), interrupt_rpm, RISING);
 
   Serial.println(F("Setup done."));
 }
@@ -321,6 +310,25 @@ void do_button() {
       buttonBeforeState = HIGH;
     }
   }
+}
+
+void initDisplays() {
+  //display.setI2CAddress(0x78); //0x3c * 2, default
+  display.begin();
+  display.setDrawColor(1);
+  display.setFontMode(0);
+  totalDisplay.setI2CAddress(0x7a); //0x3d * 2
+  totalDisplay.begin();
+  totalDisplay.setDrawColor(1);
+  totalDisplay.setFontMode(0);
+}
+
+void initOutsideSensor () {
+  outsideSensor.begin();
+  outsideSensor.getAddress(dallasDeviceAddress, 0);
+  outsideSensor.setResolution(dallasDeviceAddress, 9); //less resolution, faster reading
+  outsideSensor.setWaitForConversion(false); //async reading
+  outsideSensor.requestTemperatures(); //start first request
 }
 
 void sense_power_off() {

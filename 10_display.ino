@@ -150,7 +150,7 @@ void draw_speed(uint16_t readout) {
 
   display.setFont(SMALL_FONT);
   display.setCursor(75, 60);
-  display.println("km/h");
+  display.println(F("km/h"));
 }
 
 void draw_lambda(uint16_t readout) {
@@ -167,9 +167,9 @@ void draw_lambda(uint16_t readout) {
   display.setFont(SMALL_FONT);
   display.setCursor(80, 60);
   if (readout < 100 ) {
-    display.println("rich");
+    display.println(F("rich"));
   } else {
-    display.println("lean");
+    display.println(F("lean"));
   }
 }
 
@@ -191,7 +191,7 @@ void draw_oil_temp(uint16_t readout) {
   display.setFont(SMALL_FONT);
   display.setCursor(85, 60);
   display.println(char(0xb0)); //ASCII "degrees" symbol
-  display.println("C");
+  display.println(F("C"));
 
   if ( warningOiltemp ) {
     draw_warning();
@@ -216,7 +216,7 @@ void draw_oil_press(uint16_t readout) {
 
   display.setFont(SMALL_FONT);
   display.setCursor(85, 60);
-  display.println("bar");
+  display.println(F("bar"));
 
   if ( warningOilpress ) {
     draw_warning();
@@ -236,7 +236,7 @@ void draw_voltage(uint16_t readout) {
 
   display.setFont(SMALL_FONT);
   display.setCursor(80, 60);
-  display.println("volt");
+  display.println(F("volt"));
 
   if ( warningVoltage ) {
     draw_warning();
@@ -261,7 +261,7 @@ void draw_water_temp(uint16_t readout) {
   display.setFont(SMALL_FONT);
   display.setCursor(85, 60);
   display.println(char(0xb0)); //ASCII "degrees" symbol
-  display.println("C");
+  display.println(F("C"));
 
   if ( warningWatertemp ) {
     draw_warning();
@@ -283,7 +283,7 @@ void draw_outside_temp(int16_t readout) {
   display.setFont(SMALL_FONT);
   display.setCursor(85, 60);
   display.println(char(0xb0)); //ASCII "degrees" symbol
-  display.println("C");
+  display.println(F("C"));
   if ( warningOutsidetemp ) {
     draw_warning();
   }
@@ -298,7 +298,7 @@ void draw_rpm(uint16_t readout) {
   display.print(data);
   display.setFont(SMALL_FONT);
   display.setCursor(85, 60);
-  display.println("rpm");
+  display.println(F("rpm"));
 }
 
 void draw_logo() {

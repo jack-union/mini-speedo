@@ -323,7 +323,7 @@ void initDisplays() {
   totalDisplay.setFontMode(0);
 }
 
-void initOutsideSensor () {
+void initOutsideSensor() {
   outsideSensor.begin();
   outsideSensor.getAddress(dallasDeviceAddress, 0);
   outsideSensor.setResolution(dallasDeviceAddress, 9); //less resolution, faster reading

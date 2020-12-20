@@ -152,9 +152,8 @@ const unsigned char *displayNames[] = {
 //1,3" SH1106 display
 //U8G2_SH1106_128X64_NONAME_2_HW_I2C display(U8G2_R0);
 //0,96" SSD1306 display
-U8G2_SSD1306_128X64_NONAME_2_HW_I2C bigDisplay(U8G2_R0);
-//0,91" SSD1306 additional small display
-//U8G2_SSD1306_128X32_UNIVISION_2_HW_I2C totalDisplay(U8G2_R0); //different one needs more RAM
+U8G2_SSD1306_128X64_NONAME_2_HW_I2C bigDisplay(U8G2_R2);
+//0,96" SSD1306 additional display
 U8G2_SSD1306_128X64_NONAME_2_HW_I2C smallDisplay(U8G2_R0);
 
 // create the motor object with the maximum steps allowed

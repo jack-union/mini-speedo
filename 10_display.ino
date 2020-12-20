@@ -25,7 +25,7 @@ void initDisplays() {
   smallDisplay.firstPage();
   do {
     smallDisplay.setFont(SMALL_FONT);
-    smallDisplay.setCursor(0, 20);
+    smallDisplay.setCursor(0, 60);
     smallDisplay.println(F(MINI_SPEEDO_VERSION));
   } while ( smallDisplay.nextPage() );
 }

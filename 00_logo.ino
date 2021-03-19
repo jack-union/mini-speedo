@@ -1,6 +1,6 @@
 /*
  * Logo definition
- * 
+ *
  */
 //----Define Logo-------
 /*

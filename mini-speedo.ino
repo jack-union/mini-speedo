@@ -124,7 +124,7 @@
 //----End Display modes----
 
 //----Display mode names----
-const unsigned char *displayNames[] = {
+const char *displayNames[] = {
     "trip",  "speed", "lambda",  "oil temp", "oil press",
     "water", "volt",  "outside", "rpm",
     "" // no text in logo mode
